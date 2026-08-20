@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ArrowDownCircle, ArrowUpCircle, History, Lock, Pencil, Printer } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { useAppData } from "@/lib/AppDataProvider";
 import { fmt, receiptNo } from "@/lib/format";
 import { EditHistoryModal } from "@/components/modals/EditHistoryModal";
 import type { Currency, LedgerEntry } from "@/lib/types";
@@ -21,9 +22,11 @@ export function LedgerRow({
   onEdit: (entry: LedgerEntry) => void;
 }) {
   const { t, lang } = useLanguage();
+  const { profile } = useAppData();
   const isDonation = entry.type === "donation";
   const paymentMethodName = lang === "ar" ? entry.paymentMethodNameAr : entry.paymentMethodNameEn;
   const canSeeAmount = entry.amount !== null;
+  const canPrint = !["member", "collector"].includes(profile.role);
   const [showHistory, setShowHistory] = useState(false);
 
   return (
@@ -112,14 +115,16 @@ export function LedgerRow({
         </button>
       )}
 
-      {isDonation && (
+      {isDonation && (canPrint || canEdit) && (
         <div className="mt-2 flex items-center gap-3">
-          <button
-            onClick={() => onPrint(entry)}
-            className="flex items-center gap-1 text-[11px] font-bold text-slate-500 hover:text-orange-600"
-          >
-            <Printer size={12} /> {t.printReceipt}
-          </button>
+          {canPrint && (
+            <button
+              onClick={() => onPrint(entry)}
+              className="flex items-center gap-1 text-[11px] font-bold text-slate-500 hover:text-orange-600"
+            >
+              <Printer size={12} /> {t.printReceipt}
+            </button>
+          )}
           {canEdit && (
             <button
               onClick={() => onEdit(entry)}
