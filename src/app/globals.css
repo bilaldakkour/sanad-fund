@@ -26,6 +26,32 @@ html[dir="ltr"] body {
   font-variant-numeric: tabular-nums;
 }
 
+@keyframes slide-in-from-end {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-from-start {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+html[dir="rtl"] .sidebar-panel {
+  animation: slide-in-from-end 220ms ease-out;
+}
+
+html[dir="ltr"] .sidebar-panel {
+  animation: slide-in-from-start 220ms ease-out;
+}
+
 /* تقارير قابلة للطباعة (مركز التدقيق المالي، وصل التبرع) — ورقة A4 نظيفة بدون
    خلفية الموقع أو أي عنصر واجهة، بغض النظر عن الوضع الليلي بالمتصفح. */
 @media print {

@@ -1,18 +1,39 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Languages, LogOut } from "lucide-react";
+import {
+  Bell,
+  ClipboardCheck,
+  FileBarChart,
+  HandCoins,
+  Languages,
+  LogOut,
+  Menu,
+  Settings as SettingsIcon,
+} from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { RoleBadge } from "@/components/RoleBadge";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { signOut } from "@/app/actions/auth";
 import { NotificationsSheet } from "@/components/modals/NotificationsSheet";
+import { Sidebar } from "@/components/Sidebar";
+import { APPROVER_ROLES, HANDOVER_ROLES, REPORT_ROLES } from "@/lib/types";
 
 export function Header() {
   const { t, lang, toggleLang } = useLanguage();
   const { profile, settings, notifications, unreadCount } = useAppData();
   const [showNotifs, setShowNotifs] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
+
+  const sidebarItems = [
+    ...(REPORT_ROLES.includes(profile.role) ? [{ href: "/reports", label: t.nav.reports, icon: FileBarChart }] : []),
+    ...(HANDOVER_ROLES.includes(profile.role) ? [{ href: "/handover", label: t.nav.handover, icon: HandCoins }] : []),
+    ...(APPROVER_ROLES.includes(profile.role)
+      ? [{ href: "/approvals", label: t.nav.approvals, icon: ClipboardCheck }]
+      : []),
+    ...(profile.role === "admin" ? [{ href: "/settings", label: t.nav.settings, icon: SettingsIcon }] : []),
+  ];
 
   return (
     <>
@@ -20,6 +41,15 @@ export function Header() {
         <div className="max-w-lg mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
+              {sidebarItems.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowSidebar(true)}
+                  className="me-1 flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-200 transition-transform duration-150 active:scale-90 hover:bg-slate-700"
+                >
+                  <Menu size={16} />
+                </button>
+              )}
               <Logo size={36} />
               <div>
                 <p className="font-black text-base leading-tight">
@@ -71,6 +101,7 @@ export function Header() {
       {showNotifs && (
         <NotificationsSheet notifications={notifications} onClose={() => setShowNotifs(false)} />
       )}
+      {showSidebar && <Sidebar items={sidebarItems} onClose={() => setShowSidebar(false)} />}
     </>
   );
 }
