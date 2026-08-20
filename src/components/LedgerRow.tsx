@@ -26,7 +26,7 @@ export function LedgerRow({
   const isDonation = entry.type === "donation";
   const paymentMethodName = lang === "ar" ? entry.paymentMethodNameAr : entry.paymentMethodNameEn;
   const canSeeAmount = entry.amount !== null;
-  const canPrint = !["member", "collector"].includes(profile.role);
+  const canPrint = profile.role !== "member";
   const [showHistory, setShowHistory] = useState(false);
 
   return (

@@ -6,6 +6,8 @@ import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { addDonation, type FormActionState } from "@/app/actions/donations";
 import { addExpense } from "@/app/actions/expenses";
+import { ReceiptModal } from "@/components/modals/ReceiptModal";
+import type { LedgerEntry } from "@/lib/types";
 
 const initialState: FormActionState = { error: null };
 
@@ -19,6 +21,10 @@ export function AddEntryModal({
   const { t } = useLanguage();
   const { currencies, approvedMembers } = useAppData();
   const [type, setType] = useState<"donation" | "expense">("donation");
+  const [memberId, setMemberId] = useState("");
+  const [amount, setAmount] = useState("");
+  const [currency, setCurrency] = useState(currencies[0]?.code ?? "USD");
+  const [printEntry, setPrintEntry] = useState<LedgerEntry | null>(null);
 
   const [donationState, donationAction, donationPending] = useActionState(addDonation, initialState);
   const [expenseState, expenseAction, expensePending] = useActionState(addExpense, initialState);
@@ -29,8 +35,36 @@ export function AddEntryModal({
 
   useEffect(() => {
     if (pending) attempted.current = true;
-    if (!pending && attempted.current && state.error === null) onClose();
-  }, [pending, state, onClose]);
+    if (!pending && attempted.current && state.error === null) {
+      attempted.current = false;
+      // للتبرعات: بدل ما نسكّر مباشرة، منعرض وصل جاهز للطباعة فورًا — مفيد
+      // كتير للجابي يسلّمه للمتبرّع وقت التحصيل مباشرة.
+      if (type === "donation" && donationState.entry) {
+        const member = approvedMembers.find((m) => m.id === memberId);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setPrintEntry({
+          id: donationState.entry.id,
+          entryNo: donationState.entry.entryNo,
+          type: "donation",
+          status: "approved",
+          personName: member?.full_name ?? "",
+          isMine: false,
+          amount: Number(amount),
+          currency,
+          note: "—",
+          date: donationState.entry.date,
+          recordedByName: "",
+        });
+      } else {
+        onClose();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pending, state]);
+
+  if (printEntry) {
+    return <ReceiptModal entry={printEntry} onClose={onClose} />;
+  }
 
   return (
     <div className="print:hidden fixed inset-0 bg-black/40 z-40 flex items-end justify-center">
@@ -68,7 +102,8 @@ export function AddEntryModal({
             <select
               name="memberId"
               required
-              defaultValue=""
+              value={memberId}
+              onChange={(e) => setMemberId(e.target.value)}
               className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
             >
               <option value="" disabled>
@@ -86,10 +121,17 @@ export function AddEntryModal({
                 type="number"
                 step="0.01"
                 required
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
                 placeholder={t.amountPlaceholder}
                 className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
               />
-              <select name="currency" defaultValue={currencies[0]?.code} className="border border-slate-200 rounded-xl px-2 text-sm">
+              <select
+                name="currency"
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                className="border border-slate-200 rounded-xl px-2 text-sm"
+              >
                 {currencies.map((c) => (
                   <option key={c.code} value={c.code}>
                     {c.code}

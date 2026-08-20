@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export interface FormActionState {
   error: string | null;
+  entry?: { id: string; entryNo: number; date: string } | null;
 }
 
 const ok: FormActionState = { error: null };
@@ -32,19 +33,26 @@ export async function addDonation(_prev: FormActionState, formData: FormData): P
   // "تبرعات بانتظار التأكيد" الفردية يلي أمين الصندوق بيراجعها ويأكدها.
   const collectedBy = recorderProfile?.role === "collector" ? user.id : null;
 
-  const { error } = await supabase.from("donations").insert({
-    member_id: memberId,
-    amount,
-    currency,
-    note: note || null,
-    collected_by: collectedBy,
-    recorded_by: user.id,
-  });
+  const { data: inserted, error } = await supabase
+    .from("donations")
+    .insert({
+      member_id: memberId,
+      amount,
+      currency,
+      note: note || null,
+      collected_by: collectedBy,
+      recorded_by: user.id,
+    })
+    .select("id, entry_no, donated_at")
+    .single();
 
   if (error) return { error: error.message };
 
   revalidatePath("/", "layout");
-  return ok;
+  return {
+    error: null,
+    entry: { id: inserted.id, entryNo: inserted.entry_no, date: inserted.donated_at.slice(0, 10) },
+  };
 }
 
 // عضو عادي يصرّح بتبرعه هو بس (تحويل خارجي أو نية تسليم كاش) — بيصير pending
