@@ -25,13 +25,19 @@ export async function addDonation(_prev: FormActionState, formData: FormData): P
   } = await supabase.auth.getUser();
   if (!user) return { error: "لازم تسجل دخول." };
 
-  // يلي عم يسجل الحركة هو نفسه يلي قبض المبلغ فعليًا (مهم لتقرير تسليم الجابي).
+  const { data: recorderProfile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+
+  // collected_by بتتحدد بس لما يكون الجابي هو يلي مسجّل — هاد يلي بيفعّل دفعة
+  // التسليم لاحقًا. تبرع يسجّله الإدمن بيضل بلا collected_by فينضم لقائمة
+  // "تبرعات بانتظار التأكيد" الفردية يلي أمين الصندوق بيراجعها ويأكدها.
+  const collectedBy = recorderProfile?.role === "collector" ? user.id : null;
+
   const { error } = await supabase.from("donations").insert({
     member_id: memberId,
     amount,
     currency,
     note: note || null,
-    collected_by: user.id,
+    collected_by: collectedBy,
     recorded_by: user.id,
   });
 

@@ -31,7 +31,8 @@ export function ApprovalsClient({
   const { t, lang } = useLanguage();
   const { currencies, profile } = useAppData();
   const [isPending, startTransition] = useTransition();
-  const canConfirm = profile.role === "treasurer" || profile.role === "admin";
+  // تأكيد التبرعات والتسليمات محصور بأمين الصندوق حصرًا — حتى المدير ما يقدر يأكدها.
+  const canConfirm = profile.role === "treasurer";
 
   return (
     <div className="space-y-6 print:hidden">
