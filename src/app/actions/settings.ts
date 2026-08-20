@@ -40,3 +40,39 @@ export async function addCurrency(_prev: FormActionState, formData: FormData): P
   revalidatePath("/", "layout");
   return ok;
 }
+
+export async function addPaymentMethod(
+  _prev: FormActionState,
+  formData: FormData,
+): Promise<FormActionState> {
+  const code = String(formData.get("code") || "").trim().toLowerCase().replace(/\s+/g, "_");
+  const nameAr = String(formData.get("nameAr") || "").trim();
+  const nameEn = String(formData.get("nameEn") || "").trim();
+  const instructionsAr = String(formData.get("instructionsAr") || "").trim();
+  const instructionsEn = String(formData.get("instructionsEn") || "").trim();
+
+  if (!code || !nameAr || !nameEn) {
+    return { error: "لازم تحط الرمز والاسم بالعربي والإنجليزي." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("payment_methods").insert({
+    code,
+    name_ar: nameAr,
+    name_en: nameEn,
+    instructions_ar: instructionsAr || null,
+    instructions_en: instructionsEn || null,
+  });
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/", "layout");
+  return ok;
+}
+
+export async function togglePaymentMethod(code: string, isActive: boolean) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("payment_methods").update({ is_active: isActive }).eq("code", code);
+  if (error) throw new Error(error.message);
+  revalidatePath("/", "layout");
+}

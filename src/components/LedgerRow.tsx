@@ -20,8 +20,9 @@ export function LedgerRow({
   onPrint: (entry: LedgerEntry) => void;
   onEdit: (entry: LedgerEntry) => void;
 }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const isDonation = entry.type === "donation";
+  const paymentMethodName = lang === "ar" ? entry.paymentMethodNameAr : entry.paymentMethodNameEn;
   const canSeeAmount = entry.amount !== null;
   const [showHistory, setShowHistory] = useState(false);
 
@@ -64,10 +65,25 @@ export function LedgerRow({
         </div>
       </div>
 
-      {!isDonation && entry.status === "pending" && (
+      {entry.status === "pending" && (
         <span className="mt-2 inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
-          {t.pendingApproval}
+          {isDonation ? t.pendingConfirmation : t.pendingApproval}
         </span>
+      )}
+
+      {isDonation && entry.status === "pending" && (paymentMethodName || entry.paymentReference) && (
+        <div className="mt-2 text-[11px] text-slate-500 bg-slate-50 rounded-xl px-2.5 py-1.5 space-y-0.5">
+          {paymentMethodName && (
+            <p>
+              {t.viaPaymentMethod} <span className="font-bold text-slate-700">{paymentMethodName}</span>
+            </p>
+          )}
+          {entry.paymentReference && (
+            <p className="truncate">
+              {t.paymentReferenceLabel} <span className="num-mono">{entry.paymentReference}</span>
+            </p>
+          )}
+        </div>
       )}
 
       {!isDonation && entry.status === "approved" && entry.balanceAfter != null && (

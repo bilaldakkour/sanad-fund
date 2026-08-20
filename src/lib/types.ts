@@ -25,6 +25,8 @@ export interface Currency {
   symbol: string;
 }
 
+export type DonationStatus = "pending" | "confirmed";
+
 export interface Donation {
   id: string;
   entry_no: number;
@@ -41,6 +43,36 @@ export interface Donation {
   donated_at: string;
   edited: boolean;
   edited_at: string | null;
+  status: DonationStatus;
+  payment_method_code: string | null;
+  payment_method_name_ar: string | null;
+  payment_method_name_en: string | null;
+  payment_reference: string | null;
+  confirmed_by: string | null;
+  confirmed_by_name: string | null;
+  confirmed_at: string | null;
+  handover_id: string | null;
+}
+
+export interface PaymentMethod {
+  code: string;
+  name_ar: string;
+  name_en: string;
+  instructions_ar: string | null;
+  instructions_en: string | null;
+  is_active: boolean;
+  sort_order: number;
+}
+
+export interface Handover {
+  id: string;
+  collector_id: string;
+  collector_name: string;
+  status: "pending" | "confirmed";
+  created_at: string;
+  confirmed_by: string | null;
+  confirmed_by_name: string | null;
+  confirmed_at: string | null;
 }
 
 export type ExpenseStatus = "pending" | "approved";
@@ -137,6 +169,9 @@ export interface LedgerEntry {
   approvals?: { treasurer: boolean; supervisor: boolean };
   balanceBefore?: number | null;
   balanceAfter?: number | null;
+  paymentMethodNameAr?: string | null;
+  paymentMethodNameEn?: string | null;
+  paymentReference?: string | null;
 }
 
 export function donationToEntry(d: Donation): LedgerEntry {
@@ -144,7 +179,7 @@ export function donationToEntry(d: Donation): LedgerEntry {
     id: d.id,
     entryNo: d.entry_no,
     type: "donation",
-    status: "approved",
+    status: d.status === "confirmed" ? "approved" : "pending",
     personName: d.member_name,
     isMine: false,
     amount: d.amount,
@@ -154,6 +189,9 @@ export function donationToEntry(d: Donation): LedgerEntry {
     recordedByName: d.recorded_by_name,
     edited: d.edited,
     editedAt: d.edited_at,
+    paymentMethodNameAr: d.payment_method_name_ar,
+    paymentMethodNameEn: d.payment_method_name_en,
+    paymentReference: d.payment_reference,
   };
 }
 

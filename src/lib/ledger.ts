@@ -17,6 +17,15 @@ export interface DonationFeedRow {
   collected_by: string | null;
   collected_by_name: string | null;
   exchange_rate: number | null;
+  status: "pending" | "confirmed";
+  payment_method_code: string | null;
+  payment_method_name_ar: string | null;
+  payment_method_name_en: string | null;
+  payment_reference: string | null;
+  confirmed_by: string | null;
+  confirmed_by_name: string | null;
+  confirmed_at: string | null;
+  handover_id: string | null;
 }
 
 export interface ExpenseFeedRow {
@@ -73,6 +82,15 @@ export async function fetchLedgerEntries(supabase: SupabaseClient<any>, limit = 
         donated_at: d.donated_at.slice(0, 10),
         edited: d.edited,
         edited_at: d.edited_at,
+        status: d.status,
+        payment_method_code: d.payment_method_code,
+        payment_method_name_ar: d.payment_method_name_ar,
+        payment_method_name_en: d.payment_method_name_en,
+        payment_reference: d.payment_reference,
+        confirmed_by: d.confirmed_by,
+        confirmed_by_name: d.confirmed_by_name,
+        confirmed_at: d.confirmed_at,
+        handover_id: d.handover_id,
       }),
     ),
     ...(expenses ?? []).map((e) =>
@@ -142,6 +160,15 @@ export async function fetchLedgerEntriesInRange(
         donated_at: d.donated_at.slice(0, 10),
         edited: d.edited,
         edited_at: d.edited_at,
+        status: d.status,
+        payment_method_code: d.payment_method_code,
+        payment_method_name_ar: d.payment_method_name_ar,
+        payment_method_name_en: d.payment_method_name_en,
+        payment_reference: d.payment_reference,
+        confirmed_by: d.confirmed_by,
+        confirmed_by_name: d.confirmed_by_name,
+        confirmed_at: d.confirmed_at,
+        handover_id: d.handover_id,
       }),
     ),
     ...(expenses ?? []).map((e) =>

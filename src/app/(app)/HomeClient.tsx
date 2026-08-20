@@ -79,6 +79,13 @@ export function HomeClient({
         </div>
       </div>
 
+      <Link
+        href="/donate"
+        className="flex items-center justify-center gap-2 bg-orange-600 text-white rounded-2xl py-3.5 font-bold text-sm shadow-lg shadow-orange-600/25 transition-transform duration-150 active:scale-[0.98]"
+      >
+        <HeartHandshake size={18} /> {t.donateNow}
+      </Link>
+
       <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between transition-shadow duration-200 hover:shadow-md">
         <div>
           <p className="text-[11px] text-slate-400">{t.thisMonth}</p>

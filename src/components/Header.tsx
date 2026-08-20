@@ -10,6 +10,7 @@ import {
   LogOut,
   Menu,
   Settings as SettingsIcon,
+  HeartHandshake,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { RoleBadge } from "@/components/RoleBadge";
@@ -27,6 +28,7 @@ export function Header() {
   const [showSidebar, setShowSidebar] = useState(false);
 
   const sidebarItems = [
+    { href: "/donate", label: t.nav.donate, icon: HeartHandshake },
     ...(REPORT_ROLES.includes(profile.role) ? [{ href: "/reports", label: t.nav.reports, icon: FileBarChart }] : []),
     ...(HANDOVER_ROLES.includes(profile.role) ? [{ href: "/handover", label: t.nav.handover, icon: HandCoins }] : []),
     ...(APPROVER_ROLES.includes(profile.role)

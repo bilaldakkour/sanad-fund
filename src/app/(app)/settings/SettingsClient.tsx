@@ -1,19 +1,21 @@
 "use client";
 
-import { useActionState } from "react";
-import { EyeOff } from "lucide-react";
+import { useActionState, useTransition } from "react";
+import { CreditCard, EyeOff } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
-import { saveFundSettings, addCurrency } from "@/app/actions/settings";
+import { saveFundSettings, addCurrency, addPaymentMethod, togglePaymentMethod } from "@/app/actions/settings";
 import type { FormActionState } from "@/app/actions/donations";
 
 const initialState: FormActionState = { error: null };
 
 export function SettingsClient() {
-  const { t } = useLanguage();
-  const { settings, currencies } = useAppData();
+  const { t, lang } = useLanguage();
+  const { settings, currencies, paymentMethods } = useAppData();
   const [saveState, saveAction, savePending] = useActionState(saveFundSettings, initialState);
   const [currencyState, currencyAction, currencyPending] = useActionState(addCurrency, initialState);
+  const [methodState, methodAction, methodPending] = useActionState(addPaymentMethod, initialState);
+  const [isToggling, startToggle] = useTransition();
 
   return (
     <div className="space-y-5 print:hidden">
@@ -122,6 +124,86 @@ export function SettingsClient() {
           <button
             type="submit"
             disabled={currencyPending}
+            className="w-full bg-slate-800 text-white rounded-xl py-2 text-xs font-bold disabled:opacity-60"
+          >
+            {t.add}
+          </button>
+        </form>
+      </div>
+
+      <div className="bg-white rounded-2xl p-4 shadow-sm space-y-3">
+        <p className="font-bold text-slate-700 text-sm flex items-center gap-1">
+          <CreditCard size={14} /> {t.paymentMethodsTitle}
+        </p>
+        <div className="space-y-2">
+          {paymentMethods.map((m) => (
+            <div
+              key={m.code}
+              className="flex items-center justify-between gap-2 bg-slate-50 rounded-xl px-3 py-2"
+            >
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-slate-700 truncate">
+                  {lang === "ar" ? m.name_ar : m.name_en}
+                </p>
+                {!m.is_active && <p className="text-[10px] text-slate-400">{t.inactiveMethod}</p>}
+              </div>
+              {m.code !== "collector" && (
+                <button
+                  type="button"
+                  disabled={isToggling}
+                  onClick={() => startToggle(() => togglePaymentMethod(m.code, !m.is_active))}
+                  className={`shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-lg border transition-colors duration-150 disabled:opacity-50 ${
+                    m.is_active
+                      ? "bg-white text-slate-500 border-slate-200"
+                      : "bg-orange-50 text-orange-700 border-orange-200"
+                  }`}
+                >
+                  {m.is_active ? t.deactivateMethod : t.activateMethod}
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <form action={methodAction} className="space-y-2">
+          <p className="text-xs font-bold text-slate-500 pt-2">{t.addPaymentMethod}</p>
+          <input
+            name="code"
+            placeholder={t.paymentMethodCodePlaceholder}
+            className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
+          />
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              name="nameAr"
+              placeholder={t.paymentMethodNameArPlaceholder}
+              className="border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
+            />
+            <input
+              name="nameEn"
+              placeholder={t.paymentMethodNameEnPlaceholder}
+              className="border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
+            />
+          </div>
+          <textarea
+            name="instructionsAr"
+            rows={2}
+            placeholder={t.paymentMethodInstructionsArPlaceholder}
+            className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
+          />
+          <textarea
+            name="instructionsEn"
+            rows={2}
+            placeholder={t.paymentMethodInstructionsEnPlaceholder}
+            className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
+          />
+          {methodState.error && (
+            <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl p-2">
+              {methodState.error}
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={methodPending}
             className="w-full bg-slate-800 text-white rounded-xl py-2 text-xs font-bold disabled:opacity-60"
           >
             {t.add}

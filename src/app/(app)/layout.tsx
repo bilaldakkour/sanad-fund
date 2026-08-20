@@ -4,7 +4,7 @@ import { AppDataProvider } from "@/lib/AppDataProvider";
 import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
 import { RealtimeRefresher } from "@/components/RealtimeRefresher";
-import type { AppNotification, Currency, FundSettings, Profile } from "@/lib/types";
+import type { AppNotification, Currency, FundSettings, PaymentMethod, Profile } from "@/lib/types";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -22,24 +22,31 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!profile || profile.status !== "approved") redirect("/pending");
 
-  const [{ data: currencies }, { data: settings }, { data: notifications }, { data: approvedMembers }, { data: unreadCount }] =
-    await Promise.all([
-      supabase.from("currencies").select("*").returns<Currency[]>(),
-      supabase.from("fund_settings").select("*").eq("id", 1).single<FundSettings>(),
-      supabase
-        .from("notifications_feed")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(30)
-        .returns<AppNotification[]>(),
-      supabase
-        .from("profiles")
-        .select("*")
-        .eq("status", "approved")
-        .order("full_name")
-        .returns<Profile[]>(),
-      supabase.rpc("unread_notifications_count"),
-    ]);
+  const [
+    { data: currencies },
+    { data: settings },
+    { data: notifications },
+    { data: approvedMembers },
+    { data: unreadCount },
+    { data: paymentMethods },
+  ] = await Promise.all([
+    supabase.from("currencies").select("*").returns<Currency[]>(),
+    supabase.from("fund_settings").select("*").eq("id", 1).single<FundSettings>(),
+    supabase
+      .from("notifications_feed")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(30)
+      .returns<AppNotification[]>(),
+    supabase
+      .from("profiles")
+      .select("*")
+      .eq("status", "approved")
+      .order("full_name")
+      .returns<Profile[]>(),
+    supabase.rpc("unread_notifications_count"),
+    supabase.from("payment_methods").select("*").order("sort_order").returns<PaymentMethod[]>(),
+  ]);
 
   return (
     <AppDataProvider
@@ -50,6 +57,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         notifications: notifications ?? [],
         unreadCount: unreadCount ?? 0,
         approvedMembers: approvedMembers ?? [],
+        paymentMethods: paymentMethods ?? [],
       }}
     >
       <RealtimeRefresher />

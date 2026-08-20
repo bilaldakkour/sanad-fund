@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { AppNotification, Currency, FundSettings, Profile } from "@/lib/types";
+import type { AppNotification, Currency, FundSettings, PaymentMethod, Profile } from "@/lib/types";
 
 interface AppData {
   profile: Profile;
@@ -10,6 +10,7 @@ interface AppData {
   notifications: AppNotification[];
   unreadCount: number;
   approvedMembers: Profile[];
+  paymentMethods: PaymentMethod[];
 }
 
 const AppDataContext = createContext<AppData | null>(null);

@@ -41,6 +41,49 @@ export async function addDonation(_prev: FormActionState, formData: FormData): P
   return ok;
 }
 
+// عضو عادي يصرّح بتبرعه هو بس (تحويل خارجي أو نية تسليم كاش) — بيصير pending
+// تلقائيًا (trigger بقاعدة البيانات)، أمين الصندوق يأكده بعدين.
+export async function submitMemberDonation(
+  _prev: FormActionState,
+  formData: FormData,
+): Promise<FormActionState> {
+  const amount = Number(formData.get("amount"));
+  const currency = String(formData.get("currency") || "");
+  const paymentMethodCode = String(formData.get("paymentMethodCode") || "");
+  const reference = String(formData.get("reference") || "").trim();
+
+  if (!amount || amount <= 0 || !currency || !paymentMethodCode) {
+    return { error: "تأكد من تعبئة المبلغ والعملة وطريقة الدفع." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "لازم تسجل دخول." };
+
+  const { error } = await supabase.from("donations").insert({
+    member_id: user.id,
+    amount,
+    currency,
+    payment_method_code: paymentMethodCode,
+    payment_reference: reference || null,
+    recorded_by: user.id,
+  });
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/", "layout");
+  return ok;
+}
+
+export async function confirmDonation(donationId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("confirm_donation", { donation_id: donationId });
+  if (error) throw new Error(error.message);
+  revalidatePath("/", "layout");
+}
+
 export async function editDonation(_prev: FormActionState, formData: FormData): Promise<FormActionState> {
   const id = String(formData.get("id") || "");
   const memberId = String(formData.get("memberId") || "");

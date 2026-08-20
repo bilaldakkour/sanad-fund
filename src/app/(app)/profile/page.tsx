@@ -37,12 +37,22 @@ export default async function ProfilePage() {
       donated_at: d.donated_at.slice(0, 10),
       edited: d.edited,
       edited_at: d.edited_at,
+      status: d.status,
+      payment_method_code: d.payment_method_code,
+      payment_method_name_ar: d.payment_method_name_ar,
+      payment_method_name_en: d.payment_method_name_en,
+      payment_reference: d.payment_reference,
+      confirmed_by: d.confirmed_by,
+      confirmed_by_name: d.confirmed_by_name,
+      confirmed_at: d.confirmed_at,
+      handover_id: d.handover_id,
     }),
   );
 
   const myByCurrency: Record<string, number> = {};
   entries.forEach((e) => {
-    if (e.amount != null) myByCurrency[e.currency] = (myByCurrency[e.currency] || 0) + e.amount;
+    if (e.amount != null && e.status === "approved")
+      myByCurrency[e.currency] = (myByCurrency[e.currency] || 0) + e.amount;
   });
 
   return <ProfileClient entries={entries} myByCurrency={myByCurrency} pendingMembers={pendingMembers ?? []} />;
