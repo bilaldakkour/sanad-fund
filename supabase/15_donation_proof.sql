@@ -20,7 +20,9 @@ on conflict (id) do update
 set file_size_limit = excluded.file_size_limit,
     allowed_mime_types = excluded.allowed_mime_types;
 
-alter table storage.objects enable row level security;
+-- ملاحظة: storage.objects أصلاً مفعّل عليها RLS افتراضيًا بكل مشاريع Supabase —
+-- ما منحتاج (ولا حتى منقدر) نفعّلها يدويًا من SQL Editor (الحساب يلي بيشغّل
+-- SQL Editor مش مالك الجدول هون، فبيطلع خطأ "must be owner of table objects").
 
 -- بنية المسار: {user_id}/{اسم-ملف} — كل عضو بيرفع بس جوا مجلده هو.
 drop policy if exists donation_proofs_insert on storage.objects;
