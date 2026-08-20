@@ -1,0 +1,31 @@
+import type { Currency } from "@/lib/types";
+
+export function fmt(amount: number, currencyCode: string, currencies: Currency[]): string {
+  const c = currencies.find((x) => x.code === currencyCode);
+  const symbol = c?.symbol ?? "";
+  return `${symbol}${Math.round(amount).toLocaleString("en-US")}`;
+}
+
+export function receiptNo(n: number): string {
+  return String(n).padStart(6, "0");
+}
+
+// أسماء الأشهر الشامية (مطابقة للبروتوتايب) — مختلفة عن الأسماء العربية الفصحى المعيارية.
+const LEVANTINE_MONTHS_AR = [
+  "كانون الثاني", "شباط", "آذار", "نيسان", "أيار", "حزيران",
+  "تموز", "آب", "أيلول", "تشرين الأول", "تشرين الثاني", "كانون الأول",
+];
+const MONTHS_EN = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+export function monthLabel(monthIndex: number, lang: "ar" | "en"): string {
+  return lang === "ar" ? LEVANTINE_MONTHS_AR[monthIndex] : MONTHS_EN[monthIndex];
+}
+
+/** "2026-08-21" -> "21 آب 2026" / "Aug 21, 2026" */
+export function formatDateLabel(isoDate: string, lang: "ar" | "en"): string {
+  const [y, m, d] = isoDate.split("-").map(Number);
+  const month = monthLabel(m - 1, lang);
+  return lang === "ar" ? `${d} ${month} ${y}` : `${month} ${d}, ${y}`;
+}
