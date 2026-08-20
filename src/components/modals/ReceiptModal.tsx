@@ -27,8 +27,7 @@ export function ReceiptModal({ entry, onClose }: { entry: LedgerEntry; onClose: 
         <p className="text-center text-[11px] text-slate-400 num-mono">
           {t.receiptNo}: #{receiptNo(entry.entryNo)}
         </p>
-        <p className="text-center text-sm text-slate-600 mt-4">{t.receiptTo}</p>
-        <p className="text-center font-black text-xl text-slate-900 mt-1">{entry.personName}</p>
+        <p className="text-center font-black text-xl text-slate-900 mt-4">{entry.personName}</p>
         <p className="text-center text-sm text-slate-600 mt-2">{t.receiptDonated}</p>
         <p className="text-center font-black text-3xl text-orange-600 num-mono mt-1">
           {fmt(entry.amount ?? 0, entry.currency, currencies)}

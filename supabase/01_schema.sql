@@ -41,8 +41,8 @@ create table if not exists fund_settings (
   id smallint primary key default 1 check (id = 1),
   org_name_ar text not null default 'سَنَد',
   org_name_en text not null default 'Sanad',
-  tagline_ar text not null default 'صندوق تكافل العائلة',
-  tagline_en text not null default 'Family solidarity fund',
+  tagline_ar text not null default 'لا تجارة في هذا الصندوق، بل عائلة تحمي عائلتها.',
+  tagline_en text not null default 'No business here — just a family protecting its own.',
   thank_you_ar text not null default 'جزاكم الله خيرًا، جعل الله تبرعكم في ميزان حسناتكم 🤍',
   thank_you_en text not null default 'Thank you — may this good deed stay with you always 🤍',
   hide_amounts boolean not null default true
