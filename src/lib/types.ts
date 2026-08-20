@@ -52,6 +52,7 @@ export interface Donation {
   confirmed_by_name: string | null;
   confirmed_at: string | null;
   handover_id: string | null;
+  proof_image_path?: string | null;
 }
 
 export interface PaymentMethod {

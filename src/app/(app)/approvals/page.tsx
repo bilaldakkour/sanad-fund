@@ -31,6 +31,16 @@ export default async function ApprovalsPage() {
     supabase.from("handovers_feed").select("*").eq("status", "pending"),
   ]);
 
+  const donationsWithProof = await Promise.all(
+    (pendingDonations ?? []).map(async (d) => {
+      if (!d.proof_image_path) return { ...d, proofImageUrl: null };
+      const { data } = await supabase.storage
+        .from("donation-proofs")
+        .createSignedUrl(d.proof_image_path, 3600);
+      return { ...d, proofImageUrl: data?.signedUrl ?? null };
+    }),
+  );
+
   const handoverIds = (pendingHandovers ?? []).map((h) => h.id);
   const { data: handoverDonationRows } =
     handoverIds.length > 0
@@ -55,7 +65,7 @@ export default async function ApprovalsPage() {
   return (
     <ApprovalsClient
       expenses={pendingExpenses ?? []}
-      donations={pendingDonations ?? []}
+      donations={donationsWithProof}
       handoverBatches={handoverBatches}
     />
   );

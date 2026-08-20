@@ -51,6 +51,7 @@ export async function submitMemberDonation(
   const currency = String(formData.get("currency") || "");
   const paymentMethodCode = String(formData.get("paymentMethodCode") || "");
   const reference = String(formData.get("reference") || "").trim();
+  const proofImage = formData.get("proofImage");
 
   if (!amount || amount <= 0 || !currency || !paymentMethodCode) {
     return { error: "تأكد من تعبئة المبلغ والعملة وطريقة الدفع." };
@@ -62,12 +63,27 @@ export async function submitMemberDonation(
   } = await supabase.auth.getUser();
   if (!user) return { error: "لازم تسجل دخول." };
 
+  let proofImagePath: string | null = null;
+  if (proofImage instanceof File && proofImage.size > 0) {
+    if (proofImage.size > 5 * 1024 * 1024) {
+      return { error: "الصورة كبيرة كتير — الحد الأقصى 5 ميغابايت." };
+    }
+    const ext = proofImage.name.split(".").pop() || "jpg";
+    const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from("donation-proofs")
+      .upload(path, proofImage, { contentType: proofImage.type });
+    if (uploadError) return { error: uploadError.message };
+    proofImagePath = path;
+  }
+
   const { error } = await supabase.from("donations").insert({
     member_id: user.id,
     amount,
     currency,
     payment_method_code: paymentMethodCode,
     payment_reference: reference || null,
+    proof_image_path: proofImagePath,
     recorded_by: user.id,
   });
 

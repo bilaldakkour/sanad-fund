@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { CheckCircle2, ClipboardCheck, HandCoins } from "lucide-react";
+import { CheckCircle2, ClipboardCheck, HandCoins, ImageIcon } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { fmt, receiptNo } from "@/lib/format";
@@ -25,7 +25,7 @@ export function ApprovalsClient({
   handoverBatches,
 }: {
   expenses: ExpenseFeedRow[];
-  donations: DonationFeedRow[];
+  donations: (DonationFeedRow & { proofImageUrl: string | null })[];
   handoverBatches: PendingHandoverBatch[];
 }) {
   const { t, lang } = useLanguage();
@@ -95,6 +95,20 @@ export function ApprovalsClient({
             <p className="text-[11px] text-slate-300">
               #{receiptNo(d.entry_no)} · {d.donated_at.slice(0, 10)}
             </p>
+            {d.proofImageUrl && (
+              <a
+                href={d.proofImageUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block rounded-xl overflow-hidden border border-slate-200"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={d.proofImageUrl} alt={t.viewProofImage} className="w-full max-h-48 object-cover" />
+                <span className="flex items-center gap-1 text-[11px] font-bold text-slate-500 px-2 py-1.5 bg-slate-50">
+                  <ImageIcon size={12} /> {t.viewProofImage}
+                </span>
+              </a>
+            )}
             <button
               disabled={isPending || !canConfirm}
               onClick={() => startTransition(() => confirmDonation(d.id))}

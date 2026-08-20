@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
-import { Check, HandCoins, HeartHandshake, Info } from "lucide-react";
+import { Camera, Check, HandCoins, HeartHandshake, Info } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { submitMemberDonation } from "@/app/actions/donations";
@@ -17,8 +17,11 @@ export function DonateClient() {
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState(currencies[0]?.code ?? "USD");
   const [reference, setReference] = useState("");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [state, formAction, pending] = useActionState(submitMemberDonation, initialState);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selectedMethod = activeMethods.find((m) => m.code === selectedCode);
   const isCollector = selectedCode === "collector";
@@ -31,6 +34,22 @@ export function DonateClient() {
       setSubmitted(true);
     }
   }, [pending, state]);
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    setImageError(null);
+    if (!file) {
+      setImagePreview(null);
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setImageError(t.proofImageTooBig);
+      e.target.value = "";
+      setImagePreview(null);
+      return;
+    }
+    setImagePreview(URL.createObjectURL(file));
+  }
 
   if (submitted) {
     return (
@@ -45,6 +64,9 @@ export function DonateClient() {
             setSubmitted(false);
             setAmount("");
             setReference("");
+            setImagePreview(null);
+            setImageError(null);
+            if (fileInputRef.current) fileInputRef.current.value = "";
           }}
           className="mt-6 bg-slate-900 text-white rounded-xl px-5 py-2.5 font-bold text-sm transition-transform duration-150 active:scale-[0.98]"
         >
@@ -143,6 +165,39 @@ export function DonateClient() {
             placeholder={t.paymentReferencePlaceholder}
             className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
           />
+
+          <div>
+            <label className="text-xs font-bold text-slate-500 flex items-center gap-1 mb-1.5">
+              <Camera size={13} /> {t.attachProofImage}
+            </label>
+            {/* الحقل نفسه لازم يضل موجود بالـ DOM دايمًا (حتى لما يبين preview)
+                كرمال ما يضيع الملف المختار وقت الإرسال. */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              name="proofImage"
+              accept="image/*"
+              onChange={handleFileChange}
+              className={imagePreview ? "hidden" : "block w-full text-xs text-slate-500"}
+            />
+            {imagePreview && (
+              <div className="relative mt-1.5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={imagePreview} alt="" className="w-full max-h-48 object-cover rounded-xl border border-slate-200" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImagePreview(null);
+                    if (fileInputRef.current) fileInputRef.current.value = "";
+                  }}
+                  className="absolute top-2 end-2 bg-slate-900/70 text-white text-[10px] font-bold px-2 py-1 rounded-lg"
+                >
+                  {t.changeImage}
+                </button>
+              </div>
+            )}
+            {imageError && <p className="text-[11px] text-red-600 mt-1">{imageError}</p>}
+          </div>
 
           {state.error && (
             <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl p-2">{state.error}</p>
