@@ -65,7 +65,7 @@ export function HandoverClient({
                 type="date"
                 value={fromDate}
                 onChange={(e) => setFromDate(e.target.value)}
-                className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none focus:border-orange-500"
+                className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
               />
             </div>
             <div>
@@ -74,12 +74,16 @@ export function HandoverClient({
                 type="date"
                 value={toDate}
                 onChange={(e) => setToDate(e.target.value)}
-                className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none focus:border-orange-500"
+                className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
               />
             </div>
           </div>
           {rangeError && <p className="text-[11px] text-red-600">{t.invalidRange}</p>}
-          <button onClick={applyRange} className="w-full bg-slate-900 text-white rounded-xl py-2 text-xs font-bold">
+          <button
+            type="button"
+            onClick={applyRange}
+            className="w-full bg-slate-900 text-white rounded-xl py-2 text-xs font-bold transition-transform duration-150 active:scale-[0.98]"
+          >
             {periodLabel}
           </button>
         </div>
@@ -102,8 +106,9 @@ export function HandoverClient({
 
         {donations.length > 0 && (
           <button
+            type="button"
             onClick={() => window.print()}
-            className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm flex items-center justify-center gap-2"
+            className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm flex items-center justify-center gap-2 transition-transform duration-150 active:scale-[0.98]"
           >
             <Printer size={16} /> {t.printReport}
           </button>

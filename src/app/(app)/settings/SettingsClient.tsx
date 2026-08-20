@@ -23,39 +23,39 @@ export function SettingsClient() {
           <input
             name="orgNameAr"
             defaultValue={settings.org_name_ar}
-            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500"
+            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
           />
           <label className="block text-xs font-bold text-slate-500">{t.orgNameLabel} (EN)</label>
           <input
             name="orgNameEn"
             defaultValue={settings.org_name_en}
-            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500"
+            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
           />
           <label className="block text-xs font-bold text-slate-500">{t.taglineLabel} (AR)</label>
           <input
             name="taglineAr"
             defaultValue={settings.tagline_ar}
-            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500"
+            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
           />
           <label className="block text-xs font-bold text-slate-500">{t.taglineLabel} (EN)</label>
           <input
             name="taglineEn"
             defaultValue={settings.tagline_en}
-            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500"
+            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
           />
           <label className="block text-xs font-bold text-slate-500">{t.thankYouLabel} (AR)</label>
           <textarea
             name="thankYouAr"
             defaultValue={settings.thank_you_ar}
             rows={2}
-            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500"
+            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
           />
           <label className="block text-xs font-bold text-slate-500">{t.thankYouLabel} (EN)</label>
           <textarea
             name="thankYouEn"
             defaultValue={settings.thank_you_en}
             rows={2}
-            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500"
+            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
           />
         </div>
 
@@ -85,7 +85,7 @@ export function SettingsClient() {
         <button
           type="submit"
           disabled={savePending}
-          className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm disabled:opacity-60"
+          className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm disabled:opacity-60 transition-transform duration-150 active:scale-[0.98]"
         >
           {savePending ? "..." : t.saveSettings}
         </button>
@@ -106,12 +106,12 @@ export function SettingsClient() {
             <input
               name="code"
               placeholder={t.currencyCode}
-              className="border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none focus:border-orange-500"
+              className="border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
             />
             <input
               name="symbol"
               placeholder={t.currencySymbol}
-              className="border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none focus:border-orange-500"
+              className="border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
             />
           </div>
           {currencyState.error && (

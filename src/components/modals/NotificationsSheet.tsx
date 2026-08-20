@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
-import { Bell, Megaphone, Plus, User, X } from "lucide-react";
+import { Bell, BellOff, Megaphone, Plus, User, X } from "lucide-react";
+import { EmptyState } from "@/components/EmptyState";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { markNotificationsRead, sendAnnouncement } from "@/app/actions/notifications";
@@ -81,13 +82,13 @@ export function NotificationsSheet({
               required
               rows={3}
               placeholder={t.announcementPlaceholder}
-              className="w-full border border-orange-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500 bg-white"
+              className="w-full border border-orange-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500 bg-white"
             />
             {state.error && <p className="text-xs text-red-600">{state.error}</p>}
             <button
               type="submit"
               disabled={pending}
-              className="w-full bg-orange-600 text-white rounded-xl py-2 text-xs font-bold disabled:opacity-60"
+              className="w-full bg-orange-600 text-white rounded-xl py-2 text-xs font-bold disabled:opacity-60 transition-transform duration-150 active:scale-[0.98]"
             >
               {pending ? "..." : t.sendAnnouncement}
             </button>
@@ -95,11 +96,11 @@ export function NotificationsSheet({
         )}
 
         {notifications.length === 0 ? (
-          <p className="text-slate-400 text-sm py-6 text-center">{t.noNotifications}</p>
+          <EmptyState icon={BellOff} title={t.noNotifications} />
         ) : (
           <div className="space-y-2">
             {notifications.map((n) => (
-              <div key={n.id} className="bg-slate-50 rounded-2xl p-3 space-y-1">
+              <div key={n.id} className="bg-slate-50 rounded-2xl p-3 space-y-1 transition-colors duration-150 hover:bg-slate-100">
                 <div className="flex items-start justify-between gap-2">
                   <p className="text-sm text-slate-700">{lang === "ar" ? n.message_ar : n.message_en}</p>
                   <p className="text-[10px] text-slate-400 shrink-0">

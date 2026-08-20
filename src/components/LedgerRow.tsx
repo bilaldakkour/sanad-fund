@@ -27,7 +27,7 @@ export function LedgerRow({
 
   return (
     <div
-      className={`bg-white rounded-2xl p-3 shadow-sm border-e-4 ${isDonation ? "border-orange-500" : "border-slate-500"}`}
+      className={`bg-white rounded-2xl p-3 shadow-sm border-e-4 transition-shadow duration-200 hover:shadow-md ${isDonation ? "border-orange-500" : "border-slate-500"}`}
     >
       <div className="flex items-center gap-3">
         <div

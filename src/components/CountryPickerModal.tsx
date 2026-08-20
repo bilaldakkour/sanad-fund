@@ -47,7 +47,7 @@ export function CountryPickerModal({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={lang === "ar" ? "بحث بالاسم أو الرمز..." : "Search by name or code..."}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 pr-9 pl-3 text-sm outline-none focus:border-orange-500"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 pr-9 pl-3 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
           />
         </div>
 

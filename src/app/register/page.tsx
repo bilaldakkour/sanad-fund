@@ -33,7 +33,7 @@ export default function RegisterPage() {
           name="fullName"
           required
           placeholder={t.fullName}
-          className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-500"
+          className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
         />
         <div className="flex gap-2">
           <button
@@ -51,7 +51,7 @@ export default function RegisterPage() {
             inputMode="numeric"
             required
             placeholder={t.phone}
-            className="flex-1 min-w-0 border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-500"
+            className="flex-1 min-w-0 border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
           />
         </div>
         <input type="hidden" name="phone" value={`${country.dial} ${phoneNumber}`.trim()} />
@@ -77,7 +77,7 @@ export default function RegisterPage() {
           type="email"
           required
           placeholder={t.email}
-          className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-500"
+          className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
         />
         <input
           name="password"
@@ -85,7 +85,7 @@ export default function RegisterPage() {
           required
           minLength={6}
           placeholder={t.password}
-          className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-500"
+          className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
         />
 
         {state.error && (
@@ -97,7 +97,7 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={pending}
-          className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm disabled:opacity-60"
+          className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm disabled:opacity-60 transition-transform duration-150 active:scale-[0.98]"
         >
           {pending ? "..." : t.registerBtn}
         </button>

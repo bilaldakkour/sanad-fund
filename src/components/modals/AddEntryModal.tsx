@@ -69,7 +69,7 @@ export function AddEntryModal({
               name="memberId"
               required
               defaultValue=""
-              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500"
+              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
             >
               <option value="" disabled>
                 {t.namePlaceholder}
@@ -87,7 +87,7 @@ export function AddEntryModal({
                 step="0.01"
                 required
                 placeholder={t.amountPlaceholder}
-                className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500"
+                className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
               />
               <select name="currency" defaultValue={currencies[0]?.code} className="border border-slate-200 rounded-xl px-2 text-sm">
                 {currencies.map((c) => (
@@ -100,7 +100,7 @@ export function AddEntryModal({
             <input
               name="note"
               placeholder={t.notePlaceholder}
-              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500"
+              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
             />
             {donationState.error && (
               <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl p-2">
@@ -110,7 +110,7 @@ export function AddEntryModal({
             <button
               type="submit"
               disabled={donationPending}
-              className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm disabled:opacity-60"
+              className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm disabled:opacity-60 transition-transform duration-150 active:scale-[0.98]"
             >
               {donationPending ? "..." : t.save}
             </button>
@@ -121,7 +121,7 @@ export function AddEntryModal({
               name="title"
               required
               placeholder={t.namePlaceholder}
-              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500"
+              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
             />
             <div className="flex gap-2">
               <input
@@ -130,7 +130,7 @@ export function AddEntryModal({
                 step="0.01"
                 required
                 placeholder={t.amountPlaceholder}
-                className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500"
+                className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
               />
               <select name="currency" defaultValue={currencies[0]?.code} className="border border-slate-200 rounded-xl px-2 text-sm">
                 {currencies.map((c) => (
@@ -143,7 +143,7 @@ export function AddEntryModal({
             <input
               name="reason"
               placeholder={t.notePlaceholder}
-              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500"
+              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
             />
             {expenseState.error && (
               <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl p-2">
@@ -153,7 +153,7 @@ export function AddEntryModal({
             <button
               type="submit"
               disabled={expensePending}
-              className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm disabled:opacity-60"
+              className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm disabled:opacity-60 transition-transform duration-150 active:scale-[0.98]"
             >
               {expensePending ? "..." : t.save}
             </button>

@@ -41,7 +41,7 @@ export function ReceiptModal({ entry, onClose }: { entry: LedgerEntry; onClose: 
         </p>
         <button
           onClick={() => window.print()}
-          className="print:hidden w-full bg-slate-900 text-white rounded-xl py-2.5 font-bold text-sm mt-5 flex items-center justify-center gap-2"
+          className="print:hidden w-full bg-slate-900 text-white rounded-xl py-2.5 font-bold text-sm mt-5 flex items-center justify-center gap-2 transition-transform duration-150 active:scale-[0.98]"
         >
           <Printer size={16} /> {t.print}
         </button>

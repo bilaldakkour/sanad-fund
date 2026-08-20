@@ -1,10 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Plus, Search } from "lucide-react";
+import { Inbox, Plus, Search, SearchX } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { LedgerRow } from "@/components/LedgerRow";
+import { EmptyState } from "@/components/EmptyState";
 import { ReceiptModal } from "@/components/modals/ReceiptModal";
 import { EditDonationModal } from "@/components/modals/EditDonationModal";
 import { AddEntryModal } from "@/components/modals/AddEntryModal";
@@ -44,7 +45,7 @@ export function LedgerClient({ entries }: { entries: LedgerEntry[] }) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t.search}
-          className="w-full bg-white border border-slate-200 rounded-xl py-2 pr-9 pl-3 text-sm outline-none focus:border-orange-500"
+          className="w-full bg-white border border-slate-200 rounded-xl py-2 pr-9 pl-3 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
         />
       </div>
 
@@ -57,7 +58,7 @@ export function LedgerClient({ entries }: { entries: LedgerEntry[] }) {
           <button
             key={k}
             onClick={() => setFilter(k)}
-            className={`text-xs font-bold px-3 py-1.5 rounded-full border ${filter === k ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-600 border-slate-200"}`}
+            className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-colors duration-150 active:scale-95 ${filter === k ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-600 border-slate-200"}`}
           >
             {l}
           </button>
@@ -66,7 +67,11 @@ export function LedgerClient({ entries }: { entries: LedgerEntry[] }) {
 
       <div className="space-y-2">
         {filtered.length === 0 ? (
-          <p className="text-center text-slate-400 text-sm py-8">{t.noResults}</p>
+          entries.length === 0 ? (
+            <EmptyState icon={Inbox} title={t.ledgerEmpty} />
+          ) : (
+            <EmptyState icon={SearchX} title={t.noResults} />
+          )
         ) : (
           filtered.map((e) => (
             <LedgerRow
@@ -84,7 +89,7 @@ export function LedgerClient({ entries }: { entries: LedgerEntry[] }) {
       {(canAddDonation || canAddExpense) && (
         <button
           onClick={() => setShowAdd(true)}
-          className="print:hidden fixed bottom-20 left-1/2 -translate-x-1/2 bg-orange-600 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg z-30"
+          className="print:hidden fixed bottom-20 left-1/2 -translate-x-1/2 bg-orange-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg shadow-orange-600/30 z-30 transition-transform duration-150 active:scale-90"
         >
           <Plus size={22} />
         </button>

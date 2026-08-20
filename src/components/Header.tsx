@@ -16,7 +16,7 @@ export function Header() {
 
   return (
     <>
-      <header className="print:hidden sticky top-0 z-20 bg-slate-900 text-white px-4 pt-4 pb-3 shadow-md">
+      <header className="print:hidden sticky top-0 z-20 bg-gradient-to-b from-slate-900 to-slate-800 text-white px-4 pt-4 pb-4 shadow-lg shadow-slate-900/10 rounded-b-3xl">
         <div className="max-w-lg mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -32,19 +32,21 @@ export function Header() {
             </div>
             <div className="flex items-center gap-2">
               <button
+                type="button"
                 onClick={() => setShowNotifs(true)}
-                className="relative flex items-center bg-slate-800 text-orange-300 p-1.5 rounded-lg border border-slate-700"
+                className="relative flex items-center bg-slate-800/80 text-orange-300 p-1.5 rounded-lg border border-slate-700 transition-transform duration-150 active:scale-90 hover:bg-slate-700"
               >
                 <Bell size={14} />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1.5 -end-1.5 bg-orange-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1.5 -end-1.5 bg-orange-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </span>
                 )}
               </button>
               <button
+                type="button"
                 onClick={toggleLang}
-                className="flex items-center gap-1 bg-slate-800 text-orange-300 text-xs font-bold px-2 py-1 rounded-lg border border-slate-700"
+                className="flex items-center gap-1 bg-slate-800/80 text-orange-300 text-xs font-bold px-2 py-1 rounded-lg border border-slate-700 transition-transform duration-150 active:scale-95 hover:bg-slate-700"
               >
                 <Languages size={12} /> {lang === "ar" ? "EN" : "عربي"}
               </button>
@@ -52,12 +54,12 @@ export function Header() {
             </div>
           </div>
 
-          <div className="mt-3 bg-slate-800 rounded-xl p-2 flex items-center justify-between gap-2 text-[11px]">
+          <div className="mt-3 bg-slate-800/80 rounded-xl p-2 flex items-center justify-between gap-2 text-[11px]">
             <span className="text-slate-300 font-bold truncate">{profile.full_name}</span>
             <form action={signOut}>
               <button
                 type="submit"
-                className="flex items-center gap-1 text-slate-400 hover:text-orange-300 shrink-0"
+                className="flex items-center gap-1 text-slate-400 hover:text-orange-300 shrink-0 transition-colors duration-150"
               >
                 <LogOut size={12} /> {t.logout}
               </button>

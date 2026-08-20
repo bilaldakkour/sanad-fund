@@ -37,7 +37,7 @@ export function EditDonationModal({ entry, onClose }: { entry: LedgerEntry; onCl
         <select
           name="memberId"
           required
-          className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500"
+          className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
         >
           {approvedMembers.map((m) => (
             <option key={m.id} value={m.id}>
@@ -54,7 +54,7 @@ export function EditDonationModal({ entry, onClose }: { entry: LedgerEntry; onCl
             required
             defaultValue={entry.amount ?? undefined}
             placeholder={t.amountPlaceholder}
-            className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500"
+            className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
           />
           <select
             name="currency"
@@ -73,7 +73,7 @@ export function EditDonationModal({ entry, onClose }: { entry: LedgerEntry; onCl
           name="note"
           defaultValue={entry.note === "—" ? "" : entry.note}
           placeholder={t.notePlaceholder}
-          className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500"
+          className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-orange-500"
         />
 
         {state.error && (
@@ -83,7 +83,7 @@ export function EditDonationModal({ entry, onClose }: { entry: LedgerEntry; onCl
         <button
           type="submit"
           disabled={pending}
-          className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm disabled:opacity-60"
+          className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm disabled:opacity-60 transition-transform duration-150 active:scale-[0.98]"
         >
           {pending ? "..." : t.saveEdit}
         </button>

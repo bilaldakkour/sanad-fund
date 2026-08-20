@@ -3,11 +3,12 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, FileBarChart, Printer } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileBarChart, Inbox, Printer } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { fmt, formatDateLabel, monthLabel } from "@/lib/format";
 import { LedgerRow } from "@/components/LedgerRow";
+import { EmptyState } from "@/components/EmptyState";
 import { ReceiptModal } from "@/components/modals/ReceiptModal";
 import { EditDonationModal } from "@/components/modals/EditDonationModal";
 import { Logo } from "@/components/Logo";
@@ -111,7 +112,7 @@ export function ReportsClient({
                   type="date"
                   value={customFrom}
                   onChange={(e) => setCustomFrom(e.target.value)}
-                  className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none focus:border-orange-500"
+                  className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
                 />
               </div>
               <div>
@@ -120,12 +121,16 @@ export function ReportsClient({
                   type="date"
                   value={customTo}
                   onChange={(e) => setCustomTo(e.target.value)}
-                  className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none focus:border-orange-500"
+                  className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
                 />
               </div>
             </div>
             {rangeError && <p className="text-[11px] text-red-600">{t.invalidRange}</p>}
-            <button onClick={applyCustomRange} className="w-full bg-slate-900 text-white rounded-xl py-2 text-xs font-bold">
+            <button
+              type="button"
+              onClick={applyCustomRange}
+              className="w-full bg-slate-900 text-white rounded-xl py-2 text-xs font-bold transition-transform duration-150 active:scale-[0.98]"
+            >
               {periodLabel}
             </button>
           </div>
@@ -203,15 +208,16 @@ export function ReportsClient({
         </div>
 
         <button
+          type="button"
           onClick={() => window.print()}
-          className="w-full bg-slate-900 text-white rounded-xl py-2.5 font-bold text-sm flex items-center justify-center gap-2"
+          className="w-full bg-slate-900 text-white rounded-xl py-2.5 font-bold text-sm flex items-center justify-center gap-2 transition-transform duration-150 active:scale-[0.98]"
         >
           <Printer size={16} /> {t.printReport}
         </button>
 
         <div className="space-y-2">
           {entries.length === 0 ? (
-            <p className="text-center text-slate-400 text-sm py-8">{t.reportEmpty}</p>
+            <EmptyState icon={Inbox} title={t.reportEmpty} />
           ) : (
             entries.map((e) => (
               <LedgerRow
