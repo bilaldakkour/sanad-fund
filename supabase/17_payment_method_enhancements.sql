@@ -84,6 +84,10 @@ begin
 end;
 $$;
 
+-- ملاحظة: CREATE OR REPLACE VIEW بـ Postgres بيسمح فقط بإضافة أعمدة بآخر
+-- قائمة SELECT — مش بمنتصفها (بيعتبرها rename لعمود موجود ويرفض). فلهيك
+-- gross_amount و payment_method_fee_percent مضافين بالآخر، مش بمكانهم
+-- "المنطقي" جنب amount/payment_method_name_en.
 create or replace view donations_feed as
 select
   d.id,
@@ -95,11 +99,6 @@ select
       then d.amount
     else null
   end as amount,
-  case
-    when is_full_visibility_role() or d.member_id = auth.uid() or not fs.hide_amounts
-      then d.gross_amount
-    else null
-  end as gross_amount,
   d.currency,
   d.exchange_rate,
   d.collected_by,
@@ -114,13 +113,18 @@ select
   d.payment_method_code,
   pm.name_ar as payment_method_name_ar,
   pm.name_en as payment_method_name_en,
-  pm.fee_percent as payment_method_fee_percent,
   d.payment_reference,
   d.confirmed_by,
   cnp.full_name as confirmed_by_name,
   d.confirmed_at,
   d.handover_id,
-  d.proof_image_path
+  d.proof_image_path,
+  case
+    when is_full_visibility_role() or d.member_id = auth.uid() or not fs.hide_amounts
+      then d.gross_amount
+    else null
+  end as gross_amount,
+  pm.fee_percent as payment_method_fee_percent
 from donations d
 join profiles mp on mp.id = d.member_id
 left join profiles cp on cp.id = d.collected_by
