@@ -3,7 +3,13 @@ import type { Currency } from "@/lib/types";
 export function fmt(amount: number, currencyCode: string, currencies: Currency[]): string {
   const c = currencies.find((x) => x.code === currencyCode);
   const symbol = c?.symbol ?? "";
-  return `${symbol}${Math.round(amount).toLocaleString("en-US")}`;
+  const rounded = Math.round(amount * 100) / 100;
+  const hasDecimals = Math.abs(rounded % 1) > 0.001;
+  const formatted = rounded.toLocaleString("en-US", {
+    minimumFractionDigits: hasDecimals ? 2 : 0,
+    maximumFractionDigits: 2,
+  });
+  return `${symbol}${formatted}`;
 }
 
 export function receiptNo(n: number): string {
