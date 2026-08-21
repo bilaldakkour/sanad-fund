@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState, useTransition } from "react";
-import { CreditCard, Download, EyeOff } from "lucide-react";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import { CreditCard, Download, EyeOff, ImagePlus } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { saveFundSettings, addCurrency, addPaymentMethod, togglePaymentMethod } from "@/app/actions/settings";
@@ -18,6 +18,18 @@ export function SettingsClient() {
   const [currencyState, currencyAction, currencyPending] = useActionState(addCurrency, initialState);
   const [methodState, methodAction, methodPending] = useActionState(addPaymentMethod, initialState);
   const [isToggling, startToggle] = useTransition();
+  const methodFormRef = useRef<HTMLFormElement>(null);
+  const [iconPreview, setIconPreview] = useState<string | null>(null);
+  const methodAttempted = useRef(false);
+
+  useEffect(() => {
+    if (methodPending) methodAttempted.current = true;
+    if (!methodPending && methodAttempted.current && methodState.error === null) {
+      methodAttempted.current = false;
+      methodFormRef.current?.reset();
+      setIconPreview(null);
+    }
+  }, [methodPending, methodState]);
 
   return (
     <div className="space-y-5 print:hidden">
@@ -162,36 +174,40 @@ export function SettingsClient() {
           {paymentMethods.map((m) => {
             const iconUrl = paymentMethodIconUrl(m.icon_path);
             return (
-            <div
-              key={m.code}
-              className="flex items-center justify-between gap-2 bg-slate-50 rounded-xl px-3 py-2"
-            >
-              <div className="flex items-center gap-2 min-w-0">
-                {iconUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={iconUrl} alt="" className="w-8 h-8 rounded-lg object-cover shrink-0 border border-slate-200" />
-                )}
-                <div className="min-w-0">
+              <div
+                key={m.code}
+                className={`flex items-center gap-3 rounded-2xl border p-3 transition-opacity duration-150 ${
+                  m.is_active ? "bg-slate-50 border-slate-200" : "bg-slate-50 border-slate-200 opacity-50"
+                }`}
+              >
+                <span className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
+                  {iconUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={iconUrl} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <CreditCard size={16} className="text-slate-400" />
+                  )}
+                </span>
+                <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold text-slate-700 truncate">
                     {lang === "ar" ? m.name_ar : m.name_en}
                   </p>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {!m.is_active && <p className="text-[10px] text-slate-400">{t.inactiveMethod}</p>}
+                  <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
                     {m.fee_percent > 0 && (
-                      <p className="text-[10px] text-orange-600 font-bold">{t.feeLabel} {m.fee_percent}%</p>
+                      <span className="text-[10px] font-bold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded-md">
+                        {t.feeLabel} {m.fee_percent}%
+                      </span>
                     )}
                     {m.account_number && (
-                      <p className="text-[10px] text-slate-400 num-mono truncate">{m.account_number}</p>
+                      <span className="text-[10px] text-slate-400 num-mono truncate">{m.account_number}</span>
                     )}
                   </div>
                 </div>
-              </div>
-              {m.code !== "collector" && (
                 <button
                   type="button"
                   disabled={isToggling}
                   onClick={() => startToggle(() => togglePaymentMethod(m.code, !m.is_active))}
-                  className={`shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-lg border transition-colors duration-150 disabled:opacity-50 ${
+                  className={`shrink-0 text-[11px] font-bold px-2.5 py-1.5 rounded-lg border transition-colors duration-150 disabled:opacity-50 ${
                     m.is_active
                       ? "bg-white text-slate-500 border-slate-200"
                       : "bg-orange-50 text-orange-700 border-orange-200"
@@ -199,49 +215,59 @@ export function SettingsClient() {
                 >
                   {m.is_active ? t.deactivateMethod : t.activateMethod}
                 </button>
-              )}
-            </div>
+              </div>
             );
           })}
         </div>
 
-        <form action={methodAction} className="space-y-2">
-          <p className="text-xs font-bold text-slate-500 pt-2">{t.addPaymentMethod}</p>
+        <form ref={methodFormRef} action={methodAction} className="space-y-3 bg-slate-50 rounded-2xl p-3">
+          <p className="text-xs font-bold text-slate-500">{t.addPaymentMethod}</p>
+
+          <div className="flex items-center gap-3">
+            <label className="w-14 h-14 rounded-xl bg-white border border-dashed border-slate-300 flex items-center justify-center shrink-0 overflow-hidden cursor-pointer hover:border-orange-400 transition-colors duration-150">
+              {iconPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={iconPreview} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <ImagePlus size={18} className="text-slate-300" />
+              )}
+              <input
+                name="icon"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  setIconPreview(file ? URL.createObjectURL(file) : null);
+                }}
+              />
+            </label>
+            <p className="text-[11px] text-slate-400 flex-1">{t.paymentMethodIconLabel}</p>
+          </div>
+
           <input
             name="code"
             placeholder={t.paymentMethodCodePlaceholder}
-            className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
+            className="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
           />
           <div className="grid grid-cols-2 gap-2">
             <input
               name="nameAr"
               placeholder={t.paymentMethodNameArPlaceholder}
-              className="border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
+              className="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
             />
             <input
               name="nameEn"
               placeholder={t.paymentMethodNameEnPlaceholder}
-              className="border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
+              className="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
             />
           </div>
-          <textarea
-            name="instructionsAr"
-            rows={2}
-            placeholder={t.paymentMethodInstructionsArPlaceholder}
-            className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
-          />
-          <textarea
-            name="instructionsEn"
-            rows={2}
-            placeholder={t.paymentMethodInstructionsEnPlaceholder}
-            className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
-          />
-          <input
-            name="accountNumber"
-            placeholder={t.paymentMethodAccountNumberPlaceholder}
-            className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
-          />
           <div className="grid grid-cols-2 gap-2">
+            <input
+              name="accountNumber"
+              placeholder={t.paymentMethodAccountNumberPlaceholder}
+              className="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
+            />
             <input
               name="feePercent"
               type="number"
@@ -250,13 +276,21 @@ export function SettingsClient() {
               max="99"
               defaultValue="0"
               placeholder={t.paymentMethodFeePlaceholder}
-              className="border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
+              className="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
             />
-            <label className="flex items-center justify-center border border-dashed border-slate-300 rounded-xl px-2 py-2 text-xs text-slate-400 cursor-pointer hover:border-orange-400">
-              {t.paymentMethodIconLabel}
-              <input name="icon" type="file" accept="image/*" className="hidden" />
-            </label>
           </div>
+          <textarea
+            name="instructionsAr"
+            rows={2}
+            placeholder={t.paymentMethodInstructionsArPlaceholder}
+            className="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
+          />
+          <textarea
+            name="instructionsEn"
+            rows={2}
+            placeholder={t.paymentMethodInstructionsEnPlaceholder}
+            className="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
+          />
           {methodState.error && (
             <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl p-2">
               {methodState.error}
@@ -265,9 +299,9 @@ export function SettingsClient() {
           <button
             type="submit"
             disabled={methodPending}
-            className="w-full bg-slate-800 text-white rounded-xl py-2 text-xs font-bold disabled:opacity-60"
+            className="w-full bg-slate-900 text-white rounded-xl py-2.5 font-bold text-xs disabled:opacity-60 transition-transform duration-150 active:scale-[0.98]"
           >
-            {t.add}
+            {methodPending ? "..." : t.add}
           </button>
         </form>
       </div>
