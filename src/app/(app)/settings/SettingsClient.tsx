@@ -1,12 +1,14 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
-import { CreditCard, Download, EyeOff, ImagePlus } from "lucide-react";
+import { CreditCard, Download, EyeOff, ImagePlus, Pencil } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { saveFundSettings, addCurrency, addPaymentMethod, togglePaymentMethod } from "@/app/actions/settings";
 import { paymentMethodIconUrl } from "@/lib/format";
+import { EditPaymentMethodModal } from "@/components/modals/EditPaymentMethodModal";
 import type { FormActionState } from "@/app/actions/donations";
+import type { PaymentMethod } from "@/lib/types";
 
 const initialState: FormActionState = { error: null };
 
@@ -14,6 +16,7 @@ export function SettingsClient() {
   const { t, lang } = useLanguage();
   const { settings, currencies, paymentMethods, profile } = useAppData();
   const isAdmin = profile.role === "admin";
+  const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
   const [saveState, saveAction, savePending] = useActionState(saveFundSettings, initialState);
   const [currencyState, currencyAction, currencyPending] = useActionState(addCurrency, initialState);
   const [methodState, methodAction, methodPending] = useActionState(addPaymentMethod, initialState);
@@ -203,18 +206,27 @@ export function SettingsClient() {
                     )}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  disabled={isToggling}
-                  onClick={() => startToggle(() => togglePaymentMethod(m.code, !m.is_active))}
-                  className={`shrink-0 text-[11px] font-bold px-2.5 py-1.5 rounded-lg border transition-colors duration-150 disabled:opacity-50 ${
-                    m.is_active
-                      ? "bg-white text-slate-500 border-slate-200"
-                      : "bg-orange-50 text-orange-700 border-orange-200"
-                  }`}
-                >
-                  {m.is_active ? t.deactivateMethod : t.activateMethod}
-                </button>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setEditingMethod(m)}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:text-orange-600 transition-colors duration-150"
+                  >
+                    <Pencil size={13} />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isToggling}
+                    onClick={() => startToggle(() => togglePaymentMethod(m.code, !m.is_active))}
+                    className={`text-[11px] font-bold px-2.5 py-1.5 rounded-lg border transition-colors duration-150 disabled:opacity-50 ${
+                      m.is_active
+                        ? "bg-white text-slate-500 border-slate-200"
+                        : "bg-orange-50 text-orange-700 border-orange-200"
+                    }`}
+                  >
+                    {m.is_active ? t.deactivateMethod : t.activateMethod}
+                  </button>
+                </div>
               </div>
             );
           })}
@@ -306,6 +318,10 @@ export function SettingsClient() {
         </form>
       </div>
       </>
+      )}
+
+      {editingMethod && (
+        <EditPaymentMethodModal method={editingMethod} onClose={() => setEditingMethod(null)} />
       )}
     </div>
   );

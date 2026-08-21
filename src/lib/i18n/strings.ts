@@ -162,6 +162,9 @@ export const STRINGS = {
     paymentMethodAccountNumberPlaceholder: "الرقم أو الحساب المطلوب التحويل إليه (اختياري)",
     paymentMethodFeePlaceholder: "نسبة الخصم % (اختياري)",
     paymentMethodIconLabel: "اختر شعارًا (اختياري)",
+    editMethod: "تعديل",
+    editPaymentMethodTitle: "تعديل طريقة الدفع",
+    keepCurrentIcon: "اترك الحقل فارغًا للإبقاء على الشعار الحالي",
     removeMemberConfirm:
       "هل أنت متأكد من حذف هذا العضو؟ سيفقد الوصول إلى التطبيق فورًا، بينما يبقى سجله المالي (تبرعاته وتاريخه) محفوظًا حفاظًا على الشفافية.",
     backToLogin: "العودة إلى تسجيل الدخول",
@@ -395,6 +398,9 @@ export const STRINGS = {
     paymentMethodAccountNumberPlaceholder: "Number or account to transfer to (optional)",
     paymentMethodFeePlaceholder: "Fee % (optional)",
     paymentMethodIconLabel: "Choose a logo (optional)",
+    editMethod: "Edit",
+    editPaymentMethodTitle: "Edit payment method",
+    keepCurrentIcon: "Leave empty to keep the current logo",
     removeMemberConfirm:
       "Remove this member? They will lose access to the app immediately. Their financial history (donations, records) stays intact for transparency.",
     backToLogin: "Back to sign in",

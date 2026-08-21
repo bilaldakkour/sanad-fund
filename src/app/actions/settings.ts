@@ -94,6 +94,57 @@ export async function addPaymentMethod(
   return ok;
 }
 
+export async function updatePaymentMethod(
+  _prev: FormActionState,
+  formData: FormData,
+): Promise<FormActionState> {
+  const code = String(formData.get("code") || "").trim();
+  const nameAr = String(formData.get("nameAr") || "").trim();
+  const nameEn = String(formData.get("nameEn") || "").trim();
+  const instructionsAr = String(formData.get("instructionsAr") || "").trim();
+  const instructionsEn = String(formData.get("instructionsEn") || "").trim();
+  const accountNumber = String(formData.get("accountNumber") || "").trim();
+  const feePercent = Number(formData.get("feePercent") || 0);
+  const icon = formData.get("icon");
+
+  if (!code || !nameAr || !nameEn) {
+    return { error: "لازم تحط الاسم بالعربي والإنجليزي." };
+  }
+  if (Number.isNaN(feePercent) || feePercent < 0 || feePercent >= 100) {
+    return { error: "نسبة الخصم لازم تكون بين 0 و99." };
+  }
+
+  const supabase = await createClient();
+
+  const update: Record<string, unknown> = {
+    name_ar: nameAr,
+    name_en: nameEn,
+    instructions_ar: instructionsAr || null,
+    instructions_en: instructionsEn || null,
+    account_number: accountNumber || null,
+    fee_percent: feePercent,
+  };
+
+  if (icon instanceof File && icon.size > 0) {
+    if (icon.size > 2 * 1024 * 1024) {
+      return { error: "صورة الشعار كبيرة كتير — الحد الأقصى 2 ميغابايت." };
+    }
+    const ext = icon.name.split(".").pop() || "png";
+    const path = `${code}-${Date.now()}.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from("payment-method-icons")
+      .upload(path, icon, { contentType: icon.type });
+    if (uploadError) return { error: uploadError.message };
+    update.icon_path = path;
+  }
+
+  const { error } = await supabase.from("payment_methods").update(update).eq("code", code);
+  if (error) return { error: error.message };
+
+  revalidatePath("/", "layout");
+  return ok;
+}
+
 export async function togglePaymentMethod(code: string, isActive: boolean) {
   const supabase = await createClient();
   const { error } = await supabase.from("payment_methods").update({ is_active: isActive }).eq("code", code);
