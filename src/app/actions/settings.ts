@@ -50,18 +50,42 @@ export async function addPaymentMethod(
   const nameEn = String(formData.get("nameEn") || "").trim();
   const instructionsAr = String(formData.get("instructionsAr") || "").trim();
   const instructionsEn = String(formData.get("instructionsEn") || "").trim();
+  const accountNumber = String(formData.get("accountNumber") || "").trim();
+  const feePercent = Number(formData.get("feePercent") || 0);
+  const icon = formData.get("icon");
 
   if (!code || !nameAr || !nameEn) {
     return { error: "لازم تحط الرمز والاسم بالعربي والإنجليزي." };
   }
+  if (Number.isNaN(feePercent) || feePercent < 0 || feePercent >= 100) {
+    return { error: "نسبة الخصم لازم تكون بين 0 و99." };
+  }
 
   const supabase = await createClient();
+
+  let iconPath: string | null = null;
+  if (icon instanceof File && icon.size > 0) {
+    if (icon.size > 2 * 1024 * 1024) {
+      return { error: "صورة الشعار كبيرة كتير — الحد الأقصى 2 ميغابايت." };
+    }
+    const ext = icon.name.split(".").pop() || "png";
+    const path = `${code}-${Date.now()}.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from("payment-method-icons")
+      .upload(path, icon, { contentType: icon.type });
+    if (uploadError) return { error: uploadError.message };
+    iconPath = path;
+  }
+
   const { error } = await supabase.from("payment_methods").insert({
     code,
     name_ar: nameAr,
     name_en: nameEn,
     instructions_ar: instructionsAr || null,
     instructions_en: instructionsEn || null,
+    account_number: accountNumber || null,
+    fee_percent: feePercent,
+    icon_path: iconPath,
   });
 
   if (error) return { error: error.message };

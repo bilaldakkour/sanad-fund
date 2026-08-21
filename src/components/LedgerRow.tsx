@@ -74,7 +74,7 @@ export function LedgerRow({
         </span>
       )}
 
-      {isDonation && entry.status === "pending" && (paymentMethodName || entry.paymentReference) && (
+      {isDonation && (paymentMethodName || entry.paymentReference || (entry.grossAmount && entry.grossAmount !== entry.amount)) && (
         <div className="mt-2 text-[11px] text-slate-500 bg-slate-50 rounded-xl px-2.5 py-1.5 space-y-0.5">
           {paymentMethodName && (
             <p>
@@ -84,6 +84,19 @@ export function LedgerRow({
           {entry.paymentReference && (
             <p className="truncate">
               {t.paymentReferenceLabel} <span className="num-mono">{entry.paymentReference}</span>
+            </p>
+          )}
+          {entry.grossAmount != null && entry.grossAmount !== entry.amount && canSeeAmount && (
+            <p>
+              {t.transferredGrossLabel}{" "}
+              <span className="num-mono font-bold text-slate-700">
+                {fmt(entry.grossAmount, entry.currency, currencies)}
+              </span>
+              {" · "}
+              {t.netToFundLabel}{" "}
+              <span className="num-mono font-bold text-orange-600">
+                {fmt(entry.amount!, entry.currency, currencies)}
+              </span>
             </p>
           )}
         </div>

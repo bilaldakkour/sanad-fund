@@ -88,6 +88,15 @@ export function ApprovalsClient({
                 {t.viaPaymentMethod} {lang === "ar" ? d.payment_method_name_ar : d.payment_method_name_en}
               </p>
             )}
+            {d.gross_amount != null && d.amount != null && d.gross_amount !== d.amount && (
+              <p className="text-xs text-slate-400">
+                {t.transferredGrossLabel}{" "}
+                <span className="num-mono font-bold text-slate-600">{fmt(d.gross_amount, d.currency, currencies)}</span>
+                {" · "}
+                {t.netToFundLabel}{" "}
+                <span className="num-mono font-bold text-orange-600">{fmt(d.amount, d.currency, currencies)}</span>
+              </p>
+            )}
             {d.payment_reference && (
               <p className="text-xs text-slate-400">
                 {t.paymentReferenceLabel} <span className="num-mono">{d.payment_reference}</span>

@@ -33,6 +33,7 @@ export interface Donation {
   member_id: string;
   member_name: string;
   amount: number | null; // null means hidden by privacy rules
+  gross_amount: number | null; // what the donor actually transferred, before payment-method fees
   currency: string;
   exchange_rate: number | null;
   collected_by: string | null;
@@ -47,6 +48,7 @@ export interface Donation {
   payment_method_code: string | null;
   payment_method_name_ar: string | null;
   payment_method_name_en: string | null;
+  payment_method_fee_percent: number | null;
   payment_reference: string | null;
   confirmed_by: string | null;
   confirmed_by_name: string | null;
@@ -61,6 +63,9 @@ export interface PaymentMethod {
   name_en: string;
   instructions_ar: string | null;
   instructions_en: string | null;
+  icon_path: string | null;
+  account_number: string | null;
+  fee_percent: number;
   is_active: boolean;
   sort_order: number;
 }
@@ -161,6 +166,7 @@ export interface LedgerEntry {
   personName: string;
   isMine: boolean;
   amount: number | null; // null = hidden by privacy rules
+  grossAmount?: number | null; // what the donor transferred, before payment-method fees
   currency: string;
   note: string;
   date: string;
@@ -172,6 +178,7 @@ export interface LedgerEntry {
   balanceAfter?: number | null;
   paymentMethodNameAr?: string | null;
   paymentMethodNameEn?: string | null;
+  paymentMethodFeePercent?: number | null;
   paymentReference?: string | null;
 }
 
@@ -184,6 +191,7 @@ export function donationToEntry(d: Donation): LedgerEntry {
     personName: d.member_name,
     isMine: false,
     amount: d.amount,
+    grossAmount: d.gross_amount,
     currency: d.currency,
     note: d.note || "—",
     date: d.donated_at,
@@ -192,6 +200,7 @@ export function donationToEntry(d: Donation): LedgerEntry {
     editedAt: d.edited_at,
     paymentMethodNameAr: d.payment_method_name_ar,
     paymentMethodNameEn: d.payment_method_name_en,
+    paymentMethodFeePercent: d.payment_method_fee_percent,
     paymentReference: d.payment_reference,
   };
 }

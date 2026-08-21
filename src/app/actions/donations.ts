@@ -77,19 +77,19 @@ export async function submitMemberDonation(
   } = await supabase.auth.getUser();
   if (!user) return { error: "لازم تسجل دخول." };
 
-  let proofImagePath: string | null = null;
-  if (proofImage instanceof File && proofImage.size > 0) {
-    if (proofImage.size > 5 * 1024 * 1024) {
-      return { error: "الصورة كبيرة كتير — الحد الأقصى 5 ميغابايت." };
-    }
-    const ext = proofImage.name.split(".").pop() || "jpg";
-    const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-    const { error: uploadError } = await supabase.storage
-      .from("donation-proofs")
-      .upload(path, proofImage, { contentType: proofImage.type });
-    if (uploadError) return { error: uploadError.message };
-    proofImagePath = path;
+  if (!(proofImage instanceof File) || proofImage.size === 0) {
+    return { error: "لازم ترفق صورة إثبات التحويل قبل إرسال التصريح." };
   }
+  if (proofImage.size > 5 * 1024 * 1024) {
+    return { error: "الصورة كبيرة كتير — الحد الأقصى 5 ميغابايت." };
+  }
+  const ext = proofImage.name.split(".").pop() || "jpg";
+  const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error: uploadError } = await supabase.storage
+    .from("donation-proofs")
+    .upload(path, proofImage, { contentType: proofImage.type });
+  if (uploadError) return { error: uploadError.message };
+  const proofImagePath = path;
 
   const { error } = await supabase.from("donations").insert({
     member_id: user.id,

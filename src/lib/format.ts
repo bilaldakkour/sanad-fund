@@ -10,6 +10,11 @@ export function receiptNo(n: number): string {
   return String(n).padStart(6, "0");
 }
 
+export function paymentMethodIconUrl(path: string | null): string | null {
+  if (!path) return null;
+  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/payment-method-icons/${path}`;
+}
+
 // أسماء الأشهر الشامية (مطابقة للبروتوتايب) — مختلفة عن الأسماء العربية الفصحى المعيارية.
 const LEVANTINE_MONTHS_AR = [
   "كانون الثاني", "شباط", "آذار", "نيسان", "أيار", "حزيران",

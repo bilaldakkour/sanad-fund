@@ -5,6 +5,7 @@ import { CreditCard, Download, EyeOff } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { saveFundSettings, addCurrency, addPaymentMethod, togglePaymentMethod } from "@/app/actions/settings";
+import { paymentMethodIconUrl } from "@/lib/format";
 import type { FormActionState } from "@/app/actions/donations";
 
 const initialState: FormActionState = { error: null };
@@ -158,16 +159,32 @@ export function SettingsClient() {
           <CreditCard size={14} /> {t.paymentMethodsTitle}
         </p>
         <div className="space-y-2">
-          {paymentMethods.map((m) => (
+          {paymentMethods.map((m) => {
+            const iconUrl = paymentMethodIconUrl(m.icon_path);
+            return (
             <div
               key={m.code}
               className="flex items-center justify-between gap-2 bg-slate-50 rounded-xl px-3 py-2"
             >
-              <div className="min-w-0">
-                <p className="text-sm font-bold text-slate-700 truncate">
-                  {lang === "ar" ? m.name_ar : m.name_en}
-                </p>
-                {!m.is_active && <p className="text-[10px] text-slate-400">{t.inactiveMethod}</p>}
+              <div className="flex items-center gap-2 min-w-0">
+                {iconUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={iconUrl} alt="" className="w-8 h-8 rounded-lg object-cover shrink-0 border border-slate-200" />
+                )}
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-slate-700 truncate">
+                    {lang === "ar" ? m.name_ar : m.name_en}
+                  </p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {!m.is_active && <p className="text-[10px] text-slate-400">{t.inactiveMethod}</p>}
+                    {m.fee_percent > 0 && (
+                      <p className="text-[10px] text-orange-600 font-bold">{t.feeLabel} {m.fee_percent}%</p>
+                    )}
+                    {m.account_number && (
+                      <p className="text-[10px] text-slate-400 num-mono truncate">{m.account_number}</p>
+                    )}
+                  </div>
+                </div>
               </div>
               {m.code !== "collector" && (
                 <button
@@ -184,7 +201,8 @@ export function SettingsClient() {
                 </button>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
 
         <form action={methodAction} className="space-y-2">
@@ -218,6 +236,27 @@ export function SettingsClient() {
             placeholder={t.paymentMethodInstructionsEnPlaceholder}
             className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
           />
+          <input
+            name="accountNumber"
+            placeholder={t.paymentMethodAccountNumberPlaceholder}
+            className="w-full border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
+          />
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              name="feePercent"
+              type="number"
+              step="0.1"
+              min="0"
+              max="99"
+              defaultValue="0"
+              placeholder={t.paymentMethodFeePlaceholder}
+              className="border border-slate-200 rounded-xl px-2 py-2 text-xs outline-none transition-colors duration-150 focus:border-orange-500"
+            />
+            <label className="flex items-center justify-center border border-dashed border-slate-300 rounded-xl px-2 py-2 text-xs text-slate-400 cursor-pointer hover:border-orange-400">
+              {t.paymentMethodIconLabel}
+              <input name="icon" type="file" accept="image/*" className="hidden" />
+            </label>
+          </div>
           {methodState.error && (
             <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl p-2">
               {methodState.error}

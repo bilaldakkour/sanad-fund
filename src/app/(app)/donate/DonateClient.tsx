@@ -1,10 +1,11 @@
 "use client";
 
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
-import { Camera, Check, HandCoins, HeartHandshake, Info } from "lucide-react";
+import { Camera, Check, Copy, HandCoins, HeartHandshake, Info } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { submitMemberDonation } from "@/app/actions/donations";
+import { fmt, paymentMethodIconUrl } from "@/lib/format";
 import type { FormActionState } from "@/app/actions/donations";
 
 const initialState: FormActionState = { error: null };
@@ -19,13 +20,22 @@ export function DonateClient() {
   const [reference, setReference] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [state, formAction, pending] = useActionState(submitMemberDonation, initialState);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selectedMethod = activeMethods.find((m) => m.code === selectedCode);
   const isCollector = selectedCode === "collector";
+  const feePercent = selectedMethod?.fee_percent ?? 0;
+  const netAmount = feePercent > 0 && amount ? Number(amount) * (1 - feePercent / 100) : null;
   const attempted = useRef(false);
+
+  function copyAccountNumber(value: string) {
+    navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
 
   useEffect(() => {
     if (pending) attempted.current = true;
@@ -114,6 +124,7 @@ export function DonateClient() {
         <p className="text-xs font-bold text-slate-500">{t.selectPaymentMethod}</p>
         {activeMethods.map((m) => {
           const active = m.code === selectedCode;
+          const iconUrl = paymentMethodIconUrl(m.icon_path);
           return (
             <button
               key={m.code}
@@ -124,15 +135,23 @@ export function DonateClient() {
               }`}
             >
               <span
-                className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${
+                className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 overflow-hidden ${
                   active ? "bg-orange-100 text-orange-600" : "bg-slate-100 text-slate-500"
                 }`}
               >
-                <HandCoins size={16} />
+                {iconUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={iconUrl} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <HandCoins size={16} />
+                )}
               </span>
-              <span className="font-bold text-sm text-slate-700">
+              <span className="font-bold text-sm text-slate-700 flex-1">
                 {lang === "ar" ? m.name_ar : m.name_en}
               </span>
+              {m.fee_percent > 0 && (
+                <span className="text-[10px] font-bold text-orange-600 shrink-0">{t.feeLabel} {m.fee_percent}%</span>
+              )}
             </button>
           );
         })}
@@ -158,6 +177,34 @@ export function DonateClient() {
             </div>
           )}
 
+          {selectedMethod.account_number && (
+            <div className="flex items-center justify-between gap-2 bg-slate-50 border border-slate-200 rounded-2xl p-3">
+              <div className="min-w-0">
+                <p className="text-[11px] text-slate-400">{t.accountNumberLabel}</p>
+                <p className="num-mono font-bold text-slate-800 text-sm truncate">{selectedMethod.account_number}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => copyAccountNumber(selectedMethod.account_number!)}
+                className="shrink-0 flex items-center gap-1 text-[11px] font-bold text-orange-600 bg-orange-50 border border-orange-200 rounded-lg px-2.5 py-1.5"
+              >
+                <Copy size={12} /> {copied ? t.copiedMsg : t.copyNumber}
+              </button>
+            </div>
+          )}
+
+          {feePercent > 0 && (
+            <p className="text-[11px] text-orange-700 bg-orange-50 border border-orange-200 rounded-xl p-2">
+              {t.feeDeductionNote} {feePercent}%
+              {netAmount != null && (
+                <>
+                  {" "}
+                  — {t.netToFundLabel} {fmt(netAmount, currency, currencies)}
+                </>
+              )}
+            </p>
+          )}
+
           <input
             name="reference"
             value={reference}
@@ -168,8 +215,9 @@ export function DonateClient() {
 
           <div>
             <label className="text-xs font-bold text-slate-500 flex items-center gap-1 mb-1.5">
-              <Camera size={13} /> {t.attachProofImage}
+              <Camera size={13} /> {t.attachProofImage} <span className="text-red-500">*</span>
             </label>
+            <p className="text-[11px] text-slate-400 mb-1.5">{t.proofImageRequiredNote}</p>
             {/* الحقل نفسه لازم يضل موجود بالـ DOM دايمًا (حتى لما يبين preview)
                 كرمال ما يضيع الملف المختار وقت الإرسال. */}
             <input
@@ -205,7 +253,7 @@ export function DonateClient() {
 
           <button
             type="submit"
-            disabled={pending || !amount || Number(amount) <= 0}
+            disabled={pending || !amount || Number(amount) <= 0 || !imagePreview}
             className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm disabled:opacity-60 transition-transform duration-150 active:scale-[0.98]"
           >
             {pending ? "..." : t.submitDonation}

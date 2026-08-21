@@ -7,6 +7,7 @@ export interface DonationFeedRow {
   member_id: string;
   member_name: string;
   amount: number | null;
+  gross_amount: number | null;
   currency: string;
   note: string | null;
   donated_at: string;
@@ -21,6 +22,7 @@ export interface DonationFeedRow {
   payment_method_code: string | null;
   payment_method_name_ar: string | null;
   payment_method_name_en: string | null;
+  payment_method_fee_percent: number | null;
   payment_reference: string | null;
   confirmed_by: string | null;
   confirmed_by_name: string | null;
@@ -73,6 +75,7 @@ export async function fetchLedgerEntries(supabase: SupabaseClient<any>, limit = 
         member_id: d.member_id,
         member_name: d.member_name,
         amount: d.amount,
+        gross_amount: d.gross_amount,
         currency: d.currency,
         exchange_rate: d.exchange_rate,
         collected_by: d.collected_by,
@@ -87,6 +90,7 @@ export async function fetchLedgerEntries(supabase: SupabaseClient<any>, limit = 
         payment_method_code: d.payment_method_code,
         payment_method_name_ar: d.payment_method_name_ar,
         payment_method_name_en: d.payment_method_name_en,
+        payment_method_fee_percent: d.payment_method_fee_percent,
         payment_reference: d.payment_reference,
         confirmed_by: d.confirmed_by,
         confirmed_by_name: d.confirmed_by_name,
@@ -151,6 +155,7 @@ export async function fetchLedgerEntriesInRange(
         member_id: d.member_id,
         member_name: d.member_name,
         amount: d.amount,
+        gross_amount: d.gross_amount,
         currency: d.currency,
         exchange_rate: d.exchange_rate,
         collected_by: d.collected_by,
@@ -165,6 +170,7 @@ export async function fetchLedgerEntriesInRange(
         payment_method_code: d.payment_method_code,
         payment_method_name_ar: d.payment_method_name_ar,
         payment_method_name_en: d.payment_method_name_en,
+        payment_method_fee_percent: d.payment_method_fee_percent,
         payment_reference: d.payment_reference,
         confirmed_by: d.confirmed_by,
         confirmed_by_name: d.confirmed_by_name,
