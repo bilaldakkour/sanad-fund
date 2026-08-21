@@ -1,10 +1,11 @@
 "use client";
 
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
-import { Camera, Check, Copy, HandCoins, HeartHandshake, Info } from "lucide-react";
+import { Camera, Check, Copy, HandCoins, HeartHandshake } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { submitMemberDonation } from "@/app/actions/donations";
+import { requestPickup } from "@/app/actions/pickup";
 import { fmt, paymentMethodIconUrl } from "@/lib/format";
 import type { FormActionState } from "@/app/actions/donations";
 
@@ -21,8 +22,9 @@ export function DonateClient() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [submittedKind, setSubmittedKind] = useState<"donation" | "pickup" | null>(null);
   const [state, formAction, pending] = useActionState(submitMemberDonation, initialState);
+  const [pickupState, pickupAction, pickupPending] = useActionState(requestPickup, initialState);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selectedMethod = activeMethods.find((m) => m.code === selectedCode);
@@ -30,6 +32,7 @@ export function DonateClient() {
   const feePercent = selectedMethod?.fee_percent ?? 0;
   const netAmount = feePercent > 0 && amount ? Number(amount) * (1 - feePercent / 100) : null;
   const attempted = useRef(false);
+  const pickupAttempted = useRef(false);
 
   function copyAccountNumber(value: string) {
     navigator.clipboard.writeText(value);
@@ -41,9 +44,17 @@ export function DonateClient() {
     if (pending) attempted.current = true;
     if (!pending && attempted.current && state.error === null) {
       attempted.current = false;
-      setSubmitted(true);
+      setSubmittedKind("donation");
     }
   }, [pending, state]);
+
+  useEffect(() => {
+    if (pickupPending) pickupAttempted.current = true;
+    if (!pickupPending && pickupAttempted.current && pickupState.error === null) {
+      pickupAttempted.current = false;
+      setSubmittedKind("pickup");
+    }
+  }, [pickupPending, pickupState]);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -61,17 +72,19 @@ export function DonateClient() {
     setImagePreview(URL.createObjectURL(file));
   }
 
-  if (submitted) {
+  if (submittedKind) {
     return (
       <div className="flex flex-col items-center justify-center text-center py-16 px-6">
         <div className="w-16 h-16 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center mb-4">
           <Check size={30} />
         </div>
-        <p className="font-bold text-slate-800">{t.donationSubmitted}</p>
+        <p className="font-bold text-slate-800">
+          {submittedKind === "pickup" ? t.pickupRequestSubmitted : t.donationSubmitted}
+        </p>
         <button
           type="button"
           onClick={() => {
-            setSubmitted(false);
+            setSubmittedKind(null);
             setAmount("");
             setReference("");
             setImagePreview(null);
@@ -158,10 +171,23 @@ export function DonateClient() {
       </div>
 
       {selectedMethod && isCollector && (
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex items-start gap-2 text-xs text-slate-600">
-          <Info size={14} className="shrink-0 mt-0.5" />
-          <p>{lang === "ar" ? "الجابي رح يمر عليك ويقبض المبلغ نقدًا — ما تحتاج ترسل شي هلق." : "The collector will come by to collect the cash from you in person — no need to submit anything now."}</p>
-        </div>
+        <form action={pickupAction} className="space-y-3">
+          <input type="hidden" name="amount" value={amount} />
+          <input type="hidden" name="currency" value={currency} />
+          <p className="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs text-slate-600">
+            {t.pickupRequestNote}
+          </p>
+          {pickupState.error && (
+            <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl p-2">{pickupState.error}</p>
+          )}
+          <button
+            type="submit"
+            disabled={pickupPending || !amount || Number(amount) <= 0}
+            className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm disabled:opacity-60 transition-transform duration-150 active:scale-[0.98]"
+          >
+            {pickupPending ? "..." : t.requestPickupBtn}
+          </button>
+        </form>
       )}
 
       {selectedMethod && !isCollector && (

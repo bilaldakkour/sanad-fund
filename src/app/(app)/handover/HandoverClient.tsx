@@ -1,26 +1,35 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { HandCoins, Printer, Send } from "lucide-react";
+import { HandCoins, HandHeart, Printer, Send } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
+import { useHighlightParam } from "@/lib/useHighlightParam";
 import { fmt, receiptNo } from "@/lib/format";
 import { EmptyState } from "@/components/EmptyState";
 import { Logo } from "@/components/Logo";
+import { ReceiptModal } from "@/components/modals/ReceiptModal";
 import { requestHandover } from "@/app/actions/handover";
+import { collectPickupRequest } from "@/app/actions/pickup";
 import type { HandoverBatch, HandoverDonation } from "./page";
+import type { LedgerEntry, PickupRequest } from "@/lib/types";
 
 export function HandoverClient({
   pendingDonations,
   batches,
+  pickupRequests,
 }: {
   pendingDonations: HandoverDonation[];
   batches: HandoverBatch[];
+  pickupRequests: PickupRequest[];
 }) {
   const { t, lang, dir } = useLanguage();
   const { currencies, settings, profile } = useAppData();
   const [isPending, startTransition] = useTransition();
   const [printingBatch, setPrintingBatch] = useState<HandoverBatch | null>(null);
+  const [collectingId, setCollectingId] = useState<string | null>(null);
+  const [receiptEntry, setReceiptEntry] = useState<LedgerEntry | null>(null);
+  const highlighted = useHighlightParam();
 
   const pendingTotals: Record<string, number> = {};
   pendingDonations.forEach((d) => {
@@ -34,6 +43,32 @@ export function HandoverClient({
   function handleRequestHandover() {
     if (!window.confirm(t.requestHandoverConfirm)) return;
     startTransition(() => requestHandover());
+  }
+
+  async function handleCollect(req: PickupRequest) {
+    setCollectingId(req.id);
+    try {
+      const result = await collectPickupRequest(req.id);
+      setReceiptEntry({
+        id: result.donation_id,
+        entryNo: result.entry_no,
+        type: "donation",
+        status: "approved",
+        personName: req.member_name,
+        isMine: false,
+        amount: req.amount,
+        currency: req.currency,
+        note: "—",
+        date: result.donated_at.slice(0, 10),
+        recordedByName: "",
+      });
+    } finally {
+      setCollectingId(null);
+    }
+  }
+
+  if (receiptEntry) {
+    return <ReceiptModal entry={receiptEntry} onClose={() => setReceiptEntry(null)} />;
   }
 
   return (
@@ -91,6 +126,45 @@ export function HandoverClient({
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+        </div>
+
+        <div>
+          <p className="font-bold text-slate-700 text-sm mb-2 flex items-center gap-1.5">
+            <HandHeart size={15} className="text-orange-600" /> {t.pickupRequestsTitle}
+          </p>
+          {pickupRequests.length === 0 ? (
+            <p className="text-slate-400 text-xs">{t.noPickupRequests}</p>
+          ) : (
+            <div className="space-y-2">
+              {pickupRequests.map((req) => (
+                <div
+                  key={req.id}
+                  id={`entry-${req.id}`}
+                  className={`bg-white rounded-2xl p-3 shadow-sm flex items-center justify-between gap-2 transition-all duration-500 ${
+                    highlighted === req.id ? "ring-2 ring-orange-400 shadow-lg" : ""
+                  }`}
+                >
+                  <div className="min-w-0">
+                    <p className="font-bold text-slate-800 text-sm truncate">{req.member_name}</p>
+                    <p className="text-[11px] text-slate-400">
+                      {t.pickupRequestedOn} {req.created_at.slice(0, 10)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <p className="num-mono font-bold text-orange-600 text-sm">{fmt(req.amount, req.currency, currencies)}</p>
+                    <button
+                      type="button"
+                      disabled={collectingId === req.id}
+                      onClick={() => handleCollect(req)}
+                      className="flex items-center gap-1 bg-orange-600 text-white rounded-lg px-2.5 py-1.5 text-[11px] font-bold disabled:opacity-50 transition-transform duration-150 active:scale-95"
+                    >
+                      {collectingId === req.id ? "..." : t.collectedPickupBtn}
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>

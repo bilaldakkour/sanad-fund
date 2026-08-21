@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { HANDOVER_ROLES, type Role } from "@/lib/types";
+import { HANDOVER_ROLES, type Role, type PickupRequest } from "@/lib/types";
 import { HandoverClient } from "./HandoverClient";
 
 export interface HandoverDonation {
@@ -31,7 +31,7 @@ export default async function HandoverPage() {
   const { data: viewerProfile } = await supabase.from("profiles").select("role").eq("id", user!.id).single();
   if (!HANDOVER_ROLES.includes((viewerProfile?.role as Role) ?? "member")) redirect("/");
 
-  const [{ data: pendingRows }, { data: batchRows }] = await Promise.all([
+  const [{ data: pendingRows }, { data: batchRows }, { data: pickupRequests }] = await Promise.all([
     supabase
       .from("donations")
       .select("id, entry_no, member_id, amount, currency, note, donated_at")
@@ -40,6 +40,12 @@ export default async function HandoverPage() {
       .is("handover_id", null)
       .order("donated_at", { ascending: false }),
     supabase.from("handovers_feed").select("*").eq("collector_id", user!.id),
+    supabase
+      .from("pickup_requests_feed")
+      .select("*")
+      .eq("status", "pending")
+      .order("created_at", { ascending: false })
+      .returns<PickupRequest[]>(),
   ]);
 
   const batchIds = (batchRows ?? []).map((b) => b.id);
@@ -102,5 +108,11 @@ export default async function HandoverPage() {
     })
     .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
 
-  return <HandoverClient pendingDonations={pendingDonations} batches={batches} />;
+  return (
+    <HandoverClient
+      pendingDonations={pendingDonations}
+      batches={batches}
+      pickupRequests={pickupRequests ?? []}
+    />
+  );
 }

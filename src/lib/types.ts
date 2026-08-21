@@ -74,6 +74,22 @@ export interface PaymentMethod {
   sort_order: number;
 }
 
+export type PickupRequestStatus = "pending" | "collected" | "cancelled";
+
+export interface PickupRequest {
+  id: string;
+  member_id: string;
+  member_name: string;
+  amount: number;
+  currency: string;
+  status: PickupRequestStatus;
+  collected_by: string | null;
+  collected_by_name: string | null;
+  donation_id: string | null;
+  created_at: string;
+  collected_at: string | null;
+}
+
 export interface Handover {
   id: string;
   collector_id: string;
