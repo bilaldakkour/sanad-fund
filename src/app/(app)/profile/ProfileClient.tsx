@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Check, Trash2, XCircle } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
+import { useHighlightParam } from "@/lib/useHighlightParam";
 import { fmt } from "@/lib/format";
 import { LedgerRow } from "@/components/LedgerRow";
 import { RoleBadge } from "@/components/RoleBadge";
@@ -29,6 +30,7 @@ export function ProfileClient({
   const [receiptEntry, setReceiptEntry] = useState<LedgerEntry | null>(null);
   const [editingEntry, setEditingEntry] = useState<LedgerEntry | null>(null);
   const [isPending, startTransition] = useTransition();
+  const highlighted = useHighlightParam();
 
   const isAdmin = profile.role === "admin";
   const canEdit = ["admin", "treasurer", "collector"].includes(profile.role);
@@ -86,7 +88,13 @@ export function ProfileClient({
             {pendingMembers.map((m) => {
               const { country, number } = parsePhone(m.phone);
               return (
-                <div key={m.id} className="bg-white rounded-2xl p-3 shadow-sm space-y-2.5">
+                <div
+                  key={m.id}
+                  id={`entry-${m.id}`}
+                  className={`bg-white rounded-2xl p-3 shadow-sm space-y-2.5 transition-all duration-500 ${
+                    highlighted === m.id ? "ring-2 ring-orange-400 shadow-lg" : ""
+                  }`}
+                >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center font-black shrink-0">
                       {m.full_name[0]}

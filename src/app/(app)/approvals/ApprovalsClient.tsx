@@ -4,6 +4,7 @@ import { useTransition } from "react";
 import { CheckCircle2, ClipboardCheck, HandCoins, ImageIcon } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
+import { useHighlightParam } from "@/lib/useHighlightParam";
 import { fmt, receiptNo } from "@/lib/format";
 import { EmptyState } from "@/components/EmptyState";
 import { approveExpense } from "@/app/actions/expenses";
@@ -31,6 +32,7 @@ export function ApprovalsClient({
   const { t, lang } = useLanguage();
   const { currencies, profile } = useAppData();
   const [isPending, startTransition] = useTransition();
+  const highlighted = useHighlightParam();
   // تأكيد التبرعات والتسليمات محصور بأمين الصندوق حصرًا — حتى المدير ما يقدر يأكدها.
   const canConfirm = profile.role === "treasurer";
 
@@ -42,7 +44,13 @@ export function ApprovalsClient({
         </p>
         {handoverBatches.length === 0 && <EmptyState icon={HandCoins} title={t.noPendingHandovers} />}
         {handoverBatches.map((b) => (
-          <div key={b.id} className="bg-white rounded-2xl p-4 shadow-sm space-y-2 transition-shadow duration-200 hover:shadow-md">
+          <div
+            key={b.id}
+            id={`entry-${b.id}`}
+            className={`bg-white rounded-2xl p-4 shadow-sm space-y-2 transition-all duration-500 ${
+              highlighted === b.id ? "ring-2 ring-orange-400 shadow-lg" : "hover:shadow-md"
+            }`}
+          >
             <div className="flex items-center justify-between">
               <p className="font-bold text-slate-800 text-sm">
                 {t.handoverFrom} {b.collector_name}
@@ -76,7 +84,13 @@ export function ApprovalsClient({
         </p>
         {donations.length === 0 && <EmptyState icon={HandCoins} title={t.noPendingDonations} />}
         {donations.map((d) => (
-          <div key={d.id} className="bg-white rounded-2xl p-4 shadow-sm space-y-2 transition-shadow duration-200 hover:shadow-md">
+          <div
+            key={d.id}
+            id={`entry-${d.id}`}
+            className={`bg-white rounded-2xl p-4 shadow-sm space-y-2 transition-all duration-500 ${
+              highlighted === d.id ? "ring-2 ring-orange-400 shadow-lg" : "hover:shadow-md"
+            }`}
+          >
             <div className="flex items-center justify-between">
               <p className="font-bold text-slate-800 text-sm">{d.member_name}</p>
               <p className="num-mono font-bold text-slate-700 text-sm">

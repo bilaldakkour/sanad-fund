@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { Bell, BellOff, Megaphone, Plus, User, X } from "lucide-react";
 import { EmptyState } from "@/components/EmptyState";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
@@ -99,27 +100,43 @@ export function NotificationsSheet({
           <EmptyState icon={BellOff} title={t.noNotifications} />
         ) : (
           <div className="space-y-2">
-            {notifications.map((n) => (
-              <div key={n.id} className="bg-slate-50 rounded-2xl p-3 space-y-1 transition-colors duration-150 hover:bg-slate-100">
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm text-slate-700">{lang === "ar" ? n.message_ar : n.message_en}</p>
-                  <p className="text-[10px] text-slate-400 shrink-0">
-                    {new Date(n.created_at).toISOString().slice(0, 10)}
+            {notifications.map((n) => {
+              const content = (
+                <>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm text-slate-700">{lang === "ar" ? n.message_ar : n.message_en}</p>
+                    <p className="text-[10px] text-slate-400 shrink-0">
+                      {new Date(n.created_at).toISOString().slice(0, 10)}
+                    </p>
+                  </div>
+                  <p className="flex items-center gap-1 text-[11px] text-slate-400">
+                    {n.sender_name ? (
+                      <>
+                        <User size={10} /> {t.sentBy} {n.sender_name}
+                      </>
+                    ) : (
+                      <>
+                        <Megaphone size={10} /> {t.appName}
+                      </>
+                    )}
                   </p>
+                </>
+              );
+              return n.link ? (
+                <Link
+                  key={n.id}
+                  href={n.link}
+                  onClick={onClose}
+                  className="block bg-slate-50 rounded-2xl p-3 space-y-1 transition-colors duration-150 hover:bg-orange-50"
+                >
+                  {content}
+                </Link>
+              ) : (
+                <div key={n.id} className="bg-slate-50 rounded-2xl p-3 space-y-1 transition-colors duration-150 hover:bg-slate-100">
+                  {content}
                 </div>
-                <p className="flex items-center gap-1 text-[11px] text-slate-400">
-                  {n.sender_name ? (
-                    <>
-                      <User size={10} /> {t.sentBy} {n.sender_name}
-                    </>
-                  ) : (
-                    <>
-                      <Megaphone size={10} /> {t.appName}
-                    </>
-                  )}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

@@ -149,6 +149,7 @@ export interface AppNotification {
   created_at: string;
   sender_id: string | null;
   sender_name: string | null;
+  link: string | null;
 }
 
 export const FULL_VISIBILITY_ROLES: Role[] = ["admin", "treasurer", "supervisor"];
