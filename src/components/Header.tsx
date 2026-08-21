@@ -34,7 +34,9 @@ export function Header() {
     ...(APPROVER_ROLES.includes(profile.role)
       ? [{ href: "/approvals", label: t.nav.approvals, icon: ClipboardCheck }]
       : []),
-    ...(profile.role === "admin" ? [{ href: "/settings", label: t.nav.settings, icon: SettingsIcon }] : []),
+    ...(["admin", "treasurer"].includes(profile.role)
+      ? [{ href: "/settings", label: t.nav.settings, icon: SettingsIcon }]
+      : []),
   ];
 
   return (

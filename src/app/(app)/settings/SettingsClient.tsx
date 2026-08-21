@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useTransition } from "react";
-import { CreditCard, EyeOff } from "lucide-react";
+import { CreditCard, Download, EyeOff } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { saveFundSettings, addCurrency, addPaymentMethod, togglePaymentMethod } from "@/app/actions/settings";
@@ -11,7 +11,8 @@ const initialState: FormActionState = { error: null };
 
 export function SettingsClient() {
   const { t, lang } = useLanguage();
-  const { settings, currencies, paymentMethods } = useAppData();
+  const { settings, currencies, paymentMethods, profile } = useAppData();
+  const isAdmin = profile.role === "admin";
   const [saveState, saveAction, savePending] = useActionState(saveFundSettings, initialState);
   const [currencyState, currencyAction, currencyPending] = useActionState(addCurrency, initialState);
   const [methodState, methodAction, methodPending] = useActionState(addPaymentMethod, initialState);
@@ -19,6 +20,27 @@ export function SettingsClient() {
 
   return (
     <div className="space-y-5 print:hidden">
+      <div className="bg-white rounded-2xl p-4 shadow-sm space-y-2">
+        <p className="font-bold text-slate-700 text-sm flex items-center gap-1">
+          <Download size={14} /> {t.exportTitle}
+        </p>
+        <p className="text-[11px] text-slate-400">{t.exportDesc}</p>
+        <a
+          href="/api/export"
+          className="w-full bg-slate-900 text-white rounded-xl py-2.5 font-bold text-sm flex items-center justify-center gap-2 transition-transform duration-150 active:scale-[0.98]"
+        >
+          <Download size={16} /> {t.exportButton}
+        </a>
+      </div>
+
+      {!isAdmin && (
+        <p className="text-[11px] text-slate-400 bg-slate-50 border border-slate-200 rounded-xl p-2">
+          {t.settingsRestrictedNote}
+        </p>
+      )}
+
+      {isAdmin && (
+      <>
       <form action={saveAction} className="space-y-5">
         <div className="bg-white rounded-2xl p-4 shadow-sm space-y-3">
           <label className="block text-xs font-bold text-slate-500">{t.orgNameLabel} (AR)</label>
@@ -210,6 +232,8 @@ export function SettingsClient() {
           </button>
         </form>
       </div>
+      </>
+      )}
     </div>
   );
 }

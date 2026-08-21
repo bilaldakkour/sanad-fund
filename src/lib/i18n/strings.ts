@@ -199,6 +199,11 @@ export const STRINGS = {
     signatureTreasurer: "توقيع أمين الصندوق",
     handoverSlipTitle: "كشف تسليم تبرعات نقدية",
     handoverFooterNote: "يشهد هذا الكشف بأن المبالغ أعلاه قُبضت نقدًا وهي جاهزة للتسليم إلى أمين الصندوق.",
+    // export
+    exportTitle: "تصدير نسخة كاملة (Excel)",
+    exportDesc: "ملف Excel واحد يضم كل بيانات الصندوق: التبرعات، المصاريف، الأعضاء، دفعات التسليم، الحالات الطارئة، وسجل التعديلات. متاح فقط للمدير وأمين الصندوق.",
+    exportButton: "تنزيل نسخة Excel",
+    settingsRestrictedNote: "بعض إعدادات الصندوق (الاسم، الشعار، العملات، طرق الدفع) متاحة للمدير فقط.",
     nav: {
       home: "الرئيسية",
       ledger: "السجل",
@@ -413,6 +418,11 @@ export const STRINGS = {
     signatureTreasurer: "Treasurer signature",
     handoverSlipTitle: "Cash donations handover slip",
     handoverFooterNote: "This slip confirms the amounts above were collected in cash and are ready for handover to the treasurer.",
+    // export
+    exportTitle: "Full export (Excel)",
+    exportDesc: "One Excel file with all fund data: donations, expenses, members, handover batches, emergency cases, and the edit audit trail. Admin and treasurer only.",
+    exportButton: "Download Excel export",
+    settingsRestrictedNote: "Some fund settings (name, branding, currencies, payment methods) are admin-only.",
     nav: {
       home: "Home",
       ledger: "Ledger",
