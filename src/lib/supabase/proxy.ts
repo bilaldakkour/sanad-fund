@@ -3,7 +3,15 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_PATHS = ["/login", "/register"];
 
+// مسارات webhook تنداها قاعدة البيانات مباشرة (بدون جلسة مستخدم) — بتتحقق من
+// هويتها بنفسها بسر مشترك بالهيدر، فما لازم تمر بمنطق تسجيل الدخول هون.
+const WEBHOOK_PATHS = ["/api/notify-email"];
+
 export async function updateSession(request: NextRequest) {
+  if (WEBHOOK_PATHS.some((p) => request.nextUrl.pathname.startsWith(p))) {
+    return NextResponse.next({ request });
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
