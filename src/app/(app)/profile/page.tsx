@@ -48,6 +48,10 @@ export default async function ProfilePage() {
       confirmed_by_name: d.confirmed_by_name,
       confirmed_at: d.confirmed_at,
       handover_id: d.handover_id,
+      rejection_reason: d.rejection_reason,
+      rejected_by: d.rejected_by,
+      rejected_by_name: d.rejected_by_name,
+      rejected_at: d.rejected_at,
     }),
   );
 

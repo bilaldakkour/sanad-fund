@@ -114,6 +114,25 @@ export async function confirmDonation(donationId: string) {
   revalidatePath("/", "layout");
 }
 
+export async function rejectDonation(
+  _prev: FormActionState,
+  formData: FormData,
+): Promise<FormActionState> {
+  const donationId = String(formData.get("donationId") || "");
+  const reason = String(formData.get("reason") || "").trim();
+
+  if (!donationId || !reason) {
+    return { error: "لازم تكتب سبب الرفض." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("reject_donation", { donation_id: donationId, reason });
+  if (error) return { error: error.message };
+
+  revalidatePath("/", "layout");
+  return ok;
+}
+
 export async function editDonation(_prev: FormActionState, formData: FormData): Promise<FormActionState> {
   const id = String(formData.get("id") || "");
   const memberId = String(formData.get("memberId") || "");

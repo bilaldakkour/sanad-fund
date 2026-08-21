@@ -106,6 +106,9 @@ export async function GET() {
     { header: "ملاحظة", key: "note", width: 24 },
     { header: "معدّلة؟", key: "edited", width: 10 },
     { header: "تاريخ آخر تعديل", key: "edited_at", width: 20 },
+    { header: "سبب الرفض", key: "rejection_reason", width: 28 },
+    { header: "رفضها", key: "rejected_by_name", width: 18 },
+    { header: "تاريخ الرفض", key: "rejected_at", width: 20 },
   ];
   (donations ?? []).forEach((d) => {
     donationsSheet.addRow({
@@ -114,7 +117,7 @@ export async function GET() {
       gross_amount: d.gross_amount,
       amount: d.amount,
       currency: d.currency,
-      status: d.status === "confirmed" ? "مؤكدة" : "قيد التأكيد",
+      status: d.status === "confirmed" ? "مؤكدة" : d.status === "rejected" ? "مرفوضة" : "قيد التأكيد",
       payment_method:
         d.payment_method_name_ar ?? (d.collected_by ? "جباية يدوية" : "تسجيل مباشر"),
       payment_reference: d.payment_reference,
@@ -126,11 +129,15 @@ export async function GET() {
       note: d.note,
       edited: d.edited ? "نعم" : "لا",
       edited_at: sheetDate(d.edited_at),
+      rejection_reason: d.rejection_reason,
+      rejected_by_name: d.rejected_by_name,
+      rejected_at: sheetDate(d.rejected_at),
     });
   });
   donationsSheet.getColumn("donated_at").numFmt = "yyyy-mm-dd hh:mm";
   donationsSheet.getColumn("confirmed_at").numFmt = "yyyy-mm-dd hh:mm";
   donationsSheet.getColumn("edited_at").numFmt = "yyyy-mm-dd hh:mm";
+  donationsSheet.getColumn("rejected_at").numFmt = "yyyy-mm-dd hh:mm";
   styleHeader(donationsSheet);
 
   // -------------------------------------------------------------- المصاريف

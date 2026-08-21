@@ -1,7 +1,7 @@
 "use client";
 
-import { useTransition } from "react";
-import { CheckCircle2, ClipboardCheck, HandCoins, ImageIcon } from "lucide-react";
+import { useState, useTransition } from "react";
+import { CheckCircle2, ClipboardCheck, HandCoins, ImageIcon, XCircle } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { useHighlightParam } from "@/lib/useHighlightParam";
@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { approveExpense } from "@/app/actions/expenses";
 import { confirmDonation } from "@/app/actions/donations";
 import { confirmHandover } from "@/app/actions/handover";
+import { RejectDonationModal } from "@/components/modals/RejectDonationModal";
 import type { DonationFeedRow, ExpenseFeedRow } from "@/lib/ledger";
 
 export interface PendingHandoverBatch {
@@ -33,6 +34,7 @@ export function ApprovalsClient({
   const { currencies, profile } = useAppData();
   const [isPending, startTransition] = useTransition();
   const highlighted = useHighlightParam();
+  const [rejectingDonation, setRejectingDonation] = useState<DonationFeedRow | null>(null);
   // تأكيد التبرعات والتسليمات محصور بأمين الصندوق حصرًا — حتى المدير ما يقدر يأكدها.
   const canConfirm = profile.role === "treasurer";
 
@@ -133,13 +135,22 @@ export function ApprovalsClient({
                 </span>
               </a>
             )}
-            <button
-              disabled={isPending || !canConfirm}
-              onClick={() => startTransition(() => confirmDonation(d.id))}
-              className="w-full flex items-center justify-center gap-1.5 text-xs font-bold py-2 rounded-xl border bg-orange-600 text-white border-orange-600 disabled:opacity-40 transition-transform duration-150 active:scale-95"
-            >
-              <CheckCircle2 size={14} /> {t.confirmDonationBtn}
-            </button>
+            <div className="flex gap-2">
+              <button
+                disabled={isPending || !canConfirm}
+                onClick={() => startTransition(() => confirmDonation(d.id))}
+                className="flex-1 flex items-center justify-center gap-1.5 text-xs font-bold py-2 rounded-xl border bg-orange-600 text-white border-orange-600 disabled:opacity-40 transition-transform duration-150 active:scale-95"
+              >
+                <CheckCircle2 size={14} /> {t.confirmDonationBtn}
+              </button>
+              <button
+                disabled={isPending || !canConfirm}
+                onClick={() => setRejectingDonation(d)}
+                className="flex-1 flex items-center justify-center gap-1.5 text-xs font-bold py-2 rounded-xl border bg-white text-red-600 border-red-200 disabled:opacity-40 transition-transform duration-150 active:scale-95"
+              >
+                <XCircle size={14} /> {t.rejectDonationBtn}
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -178,6 +189,14 @@ export function ApprovalsClient({
           </div>
         ))}
       </div>
+
+      {rejectingDonation && (
+        <RejectDonationModal
+          donationId={rejectingDonation.id}
+          donorName={rejectingDonation.member_name}
+          onClose={() => setRejectingDonation(null)}
+        />
+      )}
     </div>
   );
 }

@@ -18,7 +18,7 @@ export interface DonationFeedRow {
   collected_by: string | null;
   collected_by_name: string | null;
   exchange_rate: number | null;
-  status: "pending" | "confirmed";
+  status: "pending" | "confirmed" | "rejected";
   payment_method_code: string | null;
   payment_method_name_ar: string | null;
   payment_method_name_en: string | null;
@@ -29,6 +29,10 @@ export interface DonationFeedRow {
   confirmed_at: string | null;
   handover_id: string | null;
   proof_image_path: string | null;
+  rejection_reason: string | null;
+  rejected_by: string | null;
+  rejected_by_name: string | null;
+  rejected_at: string | null;
 }
 
 export interface ExpenseFeedRow {
@@ -96,6 +100,10 @@ export async function fetchLedgerEntries(supabase: SupabaseClient<any>, limit = 
         confirmed_by_name: d.confirmed_by_name,
         confirmed_at: d.confirmed_at,
         handover_id: d.handover_id,
+        rejection_reason: d.rejection_reason,
+        rejected_by: d.rejected_by,
+        rejected_by_name: d.rejected_by_name,
+        rejected_at: d.rejected_at,
       }),
     ),
     ...(expenses ?? []).map((e) =>
@@ -176,6 +184,10 @@ export async function fetchLedgerEntriesInRange(
         confirmed_by_name: d.confirmed_by_name,
         confirmed_at: d.confirmed_at,
         handover_id: d.handover_id,
+        rejection_reason: d.rejection_reason,
+        rejected_by: d.rejected_by,
+        rejected_by_name: d.rejected_by_name,
+        rejected_at: d.rejected_at,
       }),
     ),
     ...(expenses ?? []).map((e) =>

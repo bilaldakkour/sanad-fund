@@ -74,6 +74,24 @@ export function LedgerRow({
         </span>
       )}
 
+      {entry.status === "rejected" && (
+        <span className="mt-2 inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+          {t.rejectedBadge}
+        </span>
+      )}
+
+      {entry.status === "rejected" && entry.rejectionReason && (
+        <div className="mt-2 text-[11px] text-red-700 bg-red-50 border border-red-100 rounded-xl px-2.5 py-1.5">
+          <p className="font-bold">{t.rejectionReasonLabel}:</p>
+          <p className="mt-0.5">{entry.rejectionReason}</p>
+          {entry.rejectedByName && (
+            <p className="text-red-400 mt-1">
+              {t.rejectedByLabel} {entry.rejectedByName} · {entry.rejectedAt?.slice(0, 10)}
+            </p>
+          )}
+        </div>
+      )}
+
       {isDonation && (paymentMethodName || entry.paymentReference || (entry.grossAmount && entry.grossAmount !== entry.amount)) && (
         <div className="mt-2 text-[11px] text-slate-500 bg-slate-50 rounded-xl px-2.5 py-1.5 space-y-0.5">
           {paymentMethodName && (

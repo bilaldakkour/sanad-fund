@@ -25,7 +25,7 @@ export interface Currency {
   symbol: string;
 }
 
-export type DonationStatus = "pending" | "confirmed";
+export type DonationStatus = "pending" | "confirmed" | "rejected";
 
 export interface Donation {
   id: string;
@@ -55,6 +55,10 @@ export interface Donation {
   confirmed_at: string | null;
   handover_id: string | null;
   proof_image_path?: string | null;
+  rejection_reason: string | null;
+  rejected_by: string | null;
+  rejected_by_name: string | null;
+  rejected_at: string | null;
 }
 
 export interface PaymentMethod {
@@ -163,7 +167,7 @@ export interface LedgerEntry {
   id: string;
   entryNo: number;
   type: "donation" | "expense";
-  status: "approved" | "pending";
+  status: "approved" | "pending" | "rejected";
   personName: string;
   isMine: boolean;
   amount: number | null; // null = hidden by privacy rules
@@ -181,6 +185,9 @@ export interface LedgerEntry {
   paymentMethodNameEn?: string | null;
   paymentMethodFeePercent?: number | null;
   paymentReference?: string | null;
+  rejectionReason?: string | null;
+  rejectedByName?: string | null;
+  rejectedAt?: string | null;
 }
 
 export function donationToEntry(d: Donation): LedgerEntry {
@@ -188,7 +195,7 @@ export function donationToEntry(d: Donation): LedgerEntry {
     id: d.id,
     entryNo: d.entry_no,
     type: "donation",
-    status: d.status === "confirmed" ? "approved" : "pending",
+    status: d.status === "confirmed" ? "approved" : d.status === "rejected" ? "rejected" : "pending",
     personName: d.member_name,
     isMine: false,
     amount: d.amount,
@@ -203,6 +210,9 @@ export function donationToEntry(d: Donation): LedgerEntry {
     paymentMethodNameEn: d.payment_method_name_en,
     paymentMethodFeePercent: d.payment_method_fee_percent,
     paymentReference: d.payment_reference,
+    rejectionReason: d.rejection_reason,
+    rejectedByName: d.rejected_by_name,
+    rejectedAt: d.rejected_at,
   };
 }
 
