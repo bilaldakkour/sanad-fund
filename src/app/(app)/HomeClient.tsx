@@ -7,6 +7,7 @@ import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { fmt, monthLabel } from "@/lib/format";
 import { LedgerRow } from "@/components/LedgerRow";
+import { BrandRings } from "@/components/BrandRings";
 import { GrowthChart } from "@/components/charts/GrowthChart";
 import { ReceiptModal } from "@/components/modals/ReceiptModal";
 import { EditDonationModal } from "@/components/modals/EditDonationModal";
@@ -62,6 +63,7 @@ export function HomeClient({
       <div className="relative overflow-hidden bg-gradient-to-br from-slate-800 to-slate-950 text-white rounded-3xl p-6 shadow-xl shadow-slate-900/20 ring-1 ring-white/5">
         <div className="absolute -left-8 -top-10 w-36 h-36 rounded-full bg-orange-600/20 blur-2xl" />
         <div className="absolute -right-10 -bottom-14 w-40 h-40 rounded-full bg-orange-500/10 blur-2xl" />
+        <BrandRings className="absolute -end-10 -bottom-12 w-56 h-56 text-orange-400/[0.14] rotate-[8deg]" />
         <p className="text-orange-300 text-xs relative font-bold tracking-wide">{t.balance}</p>
         <div className="relative mt-3 space-y-2">
           {balances.map((b) => (
@@ -70,7 +72,7 @@ export function HomeClient({
               className="flex items-baseline justify-between border-b border-white/10 pb-2 last:border-0"
             >
               <span className="text-slate-400 text-xs font-bold">{b.currency}</span>
-              <span className="num-mono text-4xl font-black tracking-tight">{fmt(b.balance, b.currency, currencies)}</span>
+              <span className="num-mono text-5xl font-black tracking-tight">{fmt(b.balance, b.currency, currencies)}</span>
             </div>
           ))}
         </div>
