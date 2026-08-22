@@ -60,8 +60,16 @@ export function LedgerRow({
             <p className="text-[11px] text-slate-400 num-mono">#{receiptNo(entry.entryNo)}</p>
           </div>
           <div className="flex items-center justify-between gap-2 mt-0.5">
-            <p className="text-[11px] text-slate-300">
-              {t.recordedBy} {entry.recordedByName}
+            <p className="text-[11px] font-bold text-slate-400">
+              {entry.collectedByName ? (
+                <>
+                  {t.receivedByLabel} <span className="text-orange-600">{entry.collectedByName}</span>
+                </>
+              ) : (
+                <>
+                  {t.recordedBy} {entry.recordedByName}
+                </>
+              )}
             </p>
             <p className="text-[11px] text-slate-300">{entry.date}</p>
           </div>

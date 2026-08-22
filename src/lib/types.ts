@@ -201,6 +201,7 @@ export interface LedgerEntry {
   paymentMethodNameEn?: string | null;
   paymentMethodFeePercent?: number | null;
   paymentReference?: string | null;
+  collectedByName?: string | null;
   rejectionReason?: string | null;
   rejectedByName?: string | null;
   rejectedAt?: string | null;
@@ -226,6 +227,7 @@ export function donationToEntry(d: Donation): LedgerEntry {
     paymentMethodNameEn: d.payment_method_name_en,
     paymentMethodFeePercent: d.payment_method_fee_percent,
     paymentReference: d.payment_reference,
+    collectedByName: d.collected_by_name,
     rejectionReason: d.rejection_reason,
     rejectedByName: d.rejected_by_name,
     rejectedAt: d.rejected_at,
