@@ -4,7 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { useAppData } from "@/lib/AppDataProvider";
 import { Logo } from "@/components/Logo";
+import { BrandRings } from "@/components/BrandRings";
+import { RoleBadge } from "@/components/RoleBadge";
 import type { LucideIcon } from "lucide-react";
 
 export interface SidebarItem {
@@ -14,7 +17,8 @@ export interface SidebarItem {
 }
 
 export function Sidebar({ items, onClose }: { items: SidebarItem[]; onClose: () => void }) {
-  const { t, dir } = useLanguage();
+  const { t, lang, dir } = useLanguage();
+  const { profile, settings } = useAppData();
   const pathname = usePathname();
   const side = dir === "rtl" ? "right-0" : "left-0";
 
@@ -25,15 +29,34 @@ export function Sidebar({ items, onClose }: { items: SidebarItem[]; onClose: () 
         onClick={(e) => e.stopPropagation()}
         className={`sidebar-panel absolute top-0 bottom-0 ${side} w-72 max-w-[80vw] bg-white shadow-2xl flex flex-col`}
       >
-        <div className="bg-slate-900 text-white px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Logo size={30} />
-            <p className="font-black text-sm">{t.appName}</p>
+        <div className="relative overflow-hidden bg-gradient-to-br from-slate-800 to-slate-950 text-white px-4 pt-4 pb-5 shrink-0">
+          <div className="absolute -end-10 -top-12 w-36 h-36 rounded-full bg-orange-600/20 blur-2xl" />
+          <div className="relative flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Logo size={28} />
+              <p className="font-black text-sm">{t.appName}</p>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center transition-colors duration-150 hover:bg-white/15"
+            >
+              <X size={17} className="text-slate-300" />
+            </button>
           </div>
-          <button type="button" onClick={onClose}>
-            <X size={20} className="text-slate-300" />
-          </button>
+          <div className="relative flex items-center gap-3 bg-white/5 rounded-2xl p-3 ring-1 ring-white/10">
+            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center font-black text-white shrink-0 shadow-lg shadow-orange-600/25">
+              {profile.full_name[0]}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-bold text-sm truncate">{profile.full_name}</p>
+              <div className="mt-0.5">
+                <RoleBadge role={profile.role} />
+              </div>
+            </div>
+          </div>
         </div>
+
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
           {items.map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href);
@@ -42,22 +65,32 @@ export function Sidebar({ items, onClose }: { items: SidebarItem[]; onClose: () 
                 key={href}
                 href={href}
                 onClick={onClose}
-                className={`flex items-center gap-3 px-3 py-3 rounded-2xl transition-colors duration-150 ${
+                className={`flex items-center gap-3 px-3 py-3 rounded-2xl transition-all duration-150 ${
                   active ? "bg-orange-50 text-orange-700" : "text-slate-700 hover:bg-slate-50"
                 }`}
               >
                 <span
-                  className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${
-                    active ? "bg-orange-100 text-orange-600" : "bg-slate-100 text-slate-500"
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                    active
+                      ? "bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-sm shadow-orange-600/25"
+                      : "bg-slate-100 text-slate-500"
                   }`}
                 >
-                  <Icon size={18} />
+                  <Icon size={17} />
                 </span>
-                <span className="font-bold text-sm">{label}</span>
+                <span className="font-bold text-sm flex-1">{label}</span>
+                {active && <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />}
               </Link>
             );
           })}
         </nav>
+
+        <div className="relative overflow-hidden shrink-0 border-t border-slate-100 px-4 py-3">
+          <BrandRings className="absolute -start-4 -bottom-6 w-24 h-24 text-orange-500/[0.06]" />
+          <p className="relative text-[10px] text-slate-400 text-center">
+            {lang === "ar" ? settings.tagline_ar : settings.tagline_en}
+          </p>
+        </div>
       </div>
     </div>
   );
