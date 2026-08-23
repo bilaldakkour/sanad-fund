@@ -15,17 +15,37 @@ export function ReceiptModal({ entry, onClose }: { entry: LedgerEntry; onClose: 
   const receiptRef = useRef<HTMLDivElement>(null);
   const [sharing, setSharing] = useState(false);
   const [printMode, setPrintMode] = useState<"a4" | "thermal">("a4");
+  const thermalPageStyle = useRef<HTMLStyleElement | null>(null);
 
   useEffect(() => {
-    const reset = () => setPrintMode("a4");
+    const reset = () => {
+      setPrintMode("a4");
+      thermalPageStyle.current?.remove();
+      thermalPageStyle.current = null;
+    };
     window.addEventListener("afterprint", reset);
     return () => window.removeEventListener("afterprint", reset);
   }, []);
 
   function handlePrint(mode: "a4" | "thermal") {
     setPrintMode(mode);
-    // لازم نستنى فريم واحد كرمال صنف .print-thermal-80 ينضاف للـ DOM فعليًا
-    // قبل ما نستدعي window.print() — وإلا الطباعة بتصير بإعداد الصفحة القديم.
+
+    // @page المسمّاة (page: thermal-80) ما بتنحترم بشكل موثوق بمتصفح أندرويد،
+    // فبنحقن @page افتراضية (غير مسمّاة) مباشرة بوقت الطباعة — هاي الطريقة
+    // الوحيدة يلي فعليًا بتغيّر حجم الورقة بالمعاينة والطباعة الفعلية.
+    if (mode === "thermal") {
+      const style = document.createElement("style");
+      style.media = "print";
+      style.textContent = "@page { size: 80mm auto; margin: 3mm; }";
+      document.head.appendChild(style);
+      thermalPageStyle.current = style;
+    } else {
+      thermalPageStyle.current?.remove();
+      thermalPageStyle.current = null;
+    }
+
+    // لازم نستنى فريم واحد كرمال صنف .print-thermal-80 وعنصر <style> يتطبّقوا
+    // فعليًا قبل ما نستدعي window.print() — وإلا الطباعة بتصير بالإعداد القديم.
     requestAnimationFrame(() => window.print());
   }
 
