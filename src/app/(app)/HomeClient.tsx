@@ -33,7 +33,7 @@ export function HomeClient({
   openCasesCount: number;
   chartData: { month_start: string; total: number }[];
 }) {
-  const { t, lang } = useLanguage();
+  const { t, lang, dir } = useLanguage();
   const { currencies, profile } = useAppData();
   const [receiptEntry, setReceiptEntry] = useState<LedgerEntry | null>(null);
   const [editingEntry, setEditingEntry] = useState<LedgerEntry | null>(null);
@@ -139,13 +139,23 @@ export function HomeClient({
       </div>
 
       <div className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-slate-900/5">
-        <div className="flex items-center gap-1.5 text-slate-700 text-xs font-bold mb-1">
-          <span className="w-5 h-5 rounded-lg bg-orange-50 flex items-center justify-center">
-            <TrendingUp size={12} className="text-orange-600" />
-          </span>
-          {t.chartTitle}
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <div className="flex items-center gap-2">
+            <span className="w-7 h-7 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+              <TrendingUp size={14} className="text-orange-600" />
+            </span>
+            <div>
+              <p className="text-slate-800 text-xs font-bold">{t.chartTitle}</p>
+              <p className="text-slate-400 text-[10px]">{t.chartSubtitle}</p>
+            </div>
+          </div>
+          {chart.length > 0 && (
+            <p className="num-mono font-black text-lg text-slate-800 shrink-0">
+              ${chart[chart.length - 1].value.toLocaleString("en-US")}
+            </p>
+          )}
         </div>
-        <GrowthChart data={chart} />
+        <GrowthChart data={chart} rtl={dir === "rtl"} />
       </div>
 
       <div>
