@@ -8,7 +8,8 @@ function formatCompact(value: number) {
 }
 
 // Ticks بأرقام "مدوّرة" فعليًا (0, 25, 50...) بدل ما نترك Recharts يخمّن — بيخلي
-// محور القيم يحس إنه محسوب، مش عشوائي.
+// محور القيم يحس إنه محسوب، مش عشوائي. لازم آخر tick يغطي أعلى قيمة فعليًا
+// (وإلا القمة بتنقص عن حدود الرسم وبتنقص علامة القمة معها).
 function niceTicks(max: number, count = 4): number[] {
   if (max <= 0) return [0, 1];
   const rawStep = max / (count - 1);
@@ -17,7 +18,12 @@ function niceTicks(max: number, count = 4): number[] {
   const niceResidual = residual > 5 ? 10 : residual > 2 ? 5 : residual > 1 ? 2 : 1;
   const step = niceResidual * magnitude;
   const ticks: number[] = [];
-  for (let v = 0; v <= max + step * 0.01; v += step) ticks.push(Math.round(v * 100) / 100);
+  let v = 0;
+  while (v < max) {
+    ticks.push(v);
+    v += step;
+  }
+  ticks.push(Math.round(v * 100) / 100);
   return ticks;
 }
 
@@ -64,12 +70,13 @@ export function GrowthChart({ data, rtl = true }: { data: { label: string; value
   const lastIndex = data.length - 1;
   const max = Math.max(0, ...data.map((d) => d.value));
   const ticks = niceTicks(max);
-  const domainMax = ticks[ticks.length - 1];
+  // هامش فوق آخر tick كرمال علامة القمة تاخد مسافة تنفّس وما تلزق بحافة الرسم.
+  const domainMax = Math.max(ticks[ticks.length - 1], max * 1.2);
 
   return (
     <div style={{ width: "100%", height: 200 }}>
       <ResponsiveContainer>
-        <AreaChart data={data} margin={{ top: 18, right: 6, left: 2, bottom: 0 }}>
+        <AreaChart data={data} margin={{ top: 22, right: 6, left: 2, bottom: 0 }}>
           <defs>
             <linearGradient id="growthGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#EA580C" stopOpacity={0.32} />
@@ -80,7 +87,7 @@ export function GrowthChart({ data, rtl = true }: { data: { label: string; value
           <XAxis
             dataKey="label"
             reversed={rtl}
-            tick={{ fontSize: 10.5, fill: "#94a3b8", fontWeight: 700 }}
+            tick={{ fontSize: 10.5, fill: "#64748b", fontWeight: 700 }}
             axisLine={false}
             tickLine={false}
             dy={8}
@@ -90,7 +97,7 @@ export function GrowthChart({ data, rtl = true }: { data: { label: string; value
             ticks={ticks}
             domain={[0, domainMax]}
             tickFormatter={formatCompact}
-            tick={{ fontSize: 10, fill: "#cbd5e1", fontWeight: 600 }}
+            tick={{ fontSize: 10.5, fill: "#64748b", fontWeight: 700 }}
             axisLine={false}
             tickLine={false}
             width={46}
