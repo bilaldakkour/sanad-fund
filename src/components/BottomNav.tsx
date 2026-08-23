@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HeartHandshake, Home, Receipt, User } from "lucide-react";
+import { Home, LifeBuoy, Receipt, User } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 
 export function BottomNav() {
@@ -12,7 +12,7 @@ export function BottomNav() {
   const items = [
     { href: "/", label: t.nav.home, icon: Home },
     { href: "/ledger", label: t.nav.ledger, icon: Receipt },
-    { href: "/cases", label: t.nav.cases, icon: HeartHandshake },
+    { href: "/cases", label: t.nav.cases, icon: LifeBuoy },
     { href: "/profile", label: t.nav.profile, icon: User },
   ];
 

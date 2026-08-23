@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ChevronLeft, Clock, HeartHandshake, TrendingDown, TrendingUp, Users, Wallet } from "lucide-react";
+import { ChevronLeft, Clock, HeartHandshake, LifeBuoy, TrendingDown, TrendingUp, Users, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
@@ -88,49 +88,62 @@ export function HomeClient({
         <HeartHandshake size={18} /> {t.donateNow}
       </Link>
 
-      <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between transition-shadow duration-200 hover:shadow-md">
-        <div>
-          <p className="text-[11px] text-slate-400">{t.thisMonth}</p>
-          <p className="num-mono font-bold text-lg text-slate-800">
-            ${monthGrowth.amount.toLocaleString("en-US")}
-          </p>
-        </div>
-        <div
-          className={`flex items-center gap-1 text-sm font-bold px-2.5 py-1.5 rounded-xl ${monthGrowth.up ? "bg-orange-50 text-orange-600" : "bg-slate-100 text-slate-500"}`}
-        >
-          {monthGrowth.up ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-          {Math.abs(monthGrowth.pct).toFixed(1)}%{" "}
-          <span className="text-[10px] font-normal text-slate-400">{t.vsLastMonth}</span>
+      <div className="relative overflow-hidden bg-white rounded-2xl p-4 shadow-sm ring-1 ring-slate-900/5 transition-shadow duration-200 hover:shadow-md">
+        <div className="absolute -end-8 -top-10 w-28 h-28 rounded-full bg-orange-50" />
+        <div className="relative flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-600/25 shrink-0">
+              <Wallet size={19} className="text-white" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] text-slate-400 font-bold">{t.thisMonth}</p>
+              <p className="num-mono font-black text-2xl text-slate-800 tracking-tight truncate">
+                ${monthGrowth.amount.toLocaleString("en-US")}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-0.5 shrink-0">
+            <div
+              className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1.5 rounded-xl ${monthGrowth.up ? "bg-orange-50 text-orange-600" : "bg-slate-100 text-slate-500"}`}
+            >
+              {monthGrowth.up ? <TrendingUp size={13} /> : <TrendingDown size={13} />}
+              {Math.abs(monthGrowth.pct).toFixed(1)}%
+            </div>
+            <span className="text-[10px] text-slate-400">{t.vsLastMonth}</span>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-2">
-        <div className="bg-white rounded-2xl p-3 text-center shadow-sm transition-shadow duration-200 hover:shadow-md">
-          <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center mx-auto">
-            <Wallet size={15} className="text-orange-600" />
+        <div className="bg-white rounded-2xl p-3 text-center shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mx-auto shadow-sm shadow-orange-600/25">
+            <Wallet size={16} className="text-white" />
           </div>
-          <p className="num-mono font-bold text-sm mt-1.5">{myDonationCount}</p>
-          <p className="text-[10px] text-slate-400">{t.myDonations}</p>
+          <p className="num-mono font-black text-base text-slate-800 mt-2">{myDonationCount}</p>
+          <p className="text-[10px] text-slate-400 font-bold mt-0.5">{t.myDonations}</p>
         </div>
-        <div className="bg-white rounded-2xl p-3 text-center shadow-sm transition-shadow duration-200 hover:shadow-md">
-          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center mx-auto">
-            <Users size={15} className="text-slate-600" />
+        <div className="bg-white rounded-2xl p-3 text-center shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center mx-auto shadow-sm shadow-slate-900/20">
+            <Users size={16} className="text-white" />
           </div>
-          <p className="num-mono font-bold text-sm mt-1.5">{approvedMembersCount}</p>
-          <p className="text-[10px] text-slate-400">{t.approvedMembers}</p>
+          <p className="num-mono font-black text-base text-slate-800 mt-2">{approvedMembersCount}</p>
+          <p className="text-[10px] text-slate-400 font-bold mt-0.5">{t.approvedMembers}</p>
         </div>
-        <div className="bg-white rounded-2xl p-3 text-center shadow-sm transition-shadow duration-200 hover:shadow-md">
-          <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center mx-auto">
-            <HeartHandshake size={15} className="text-orange-500" />
+        <div className="bg-white rounded-2xl p-3 text-center shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center mx-auto shadow-sm shadow-amber-600/25">
+            <LifeBuoy size={16} className="text-white" />
           </div>
-          <p className="num-mono font-bold text-sm mt-1.5">{openCasesCount}</p>
-          <p className="text-[10px] text-slate-400">{t.openCases}</p>
+          <p className="num-mono font-black text-base text-slate-800 mt-2">{openCasesCount}</p>
+          <p className="text-[10px] text-slate-400 font-bold mt-0.5">{t.openCases}</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-4 shadow-sm">
-        <div className="flex items-center gap-1 text-slate-600 text-xs font-bold mb-2">
-          <TrendingUp size={14} className="text-orange-500" /> {t.chartTitle}
+      <div className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-slate-900/5">
+        <div className="flex items-center gap-1.5 text-slate-700 text-xs font-bold mb-1">
+          <span className="w-5 h-5 rounded-lg bg-orange-50 flex items-center justify-center">
+            <TrendingUp size={12} className="text-orange-600" />
+          </span>
+          {t.chartTitle}
         </div>
         <GrowthChart data={chart} />
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
-import { HeartHandshake, Plus, X } from "lucide-react";
+import { LifeBuoy, Plus, X } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
 import { fmt } from "@/lib/format";
@@ -20,18 +20,18 @@ export function CasesClient({ cases }: { cases: EmergencyCase[] }) {
 
   return (
     <div className="space-y-3 print:hidden">
-      {cases.length === 0 && <EmptyState icon={HeartHandshake} title={t.casesEmpty} />}
+      {cases.length === 0 && <EmptyState icon={LifeBuoy} title={t.casesEmpty} />}
       {cases.map((c) => {
         const pct = c.target_amount ? Math.min(100, Math.round((c.raised_amount / c.target_amount) * 100)) : 0;
         return (
           <div
             key={c.id}
-            className="bg-white rounded-2xl p-4 shadow-sm transition-shadow duration-200 hover:shadow-md"
+            className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-slate-900/5 border-e-4 border-amber-500 transition-shadow duration-200 hover:shadow-md"
           >
             <div className="flex items-center justify-between">
               <p className="font-bold text-slate-800 text-sm">{c.title}</p>
               <span
-                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${c.status === "open" ? "bg-orange-100 text-orange-700" : "bg-slate-100 text-slate-500"}`}
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${c.status === "open" ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-500"}`}
               >
                 {c.status === "open" ? t.open : t.closed}
               </span>
@@ -41,12 +41,12 @@ export function CasesClient({ cases }: { cases: EmergencyCase[] }) {
               <>
                 <div className="w-full bg-slate-100 rounded-full h-2 mt-3 overflow-hidden">
                   <div
-                    className="bg-orange-600 h-2 rounded-full transition-all duration-700 ease-out"
+                    className="bg-gradient-to-r from-amber-500 to-amber-600 h-2 rounded-full transition-all duration-700 ease-out"
                     style={{ width: `${pct}%` }}
                   />
                 </div>
                 <div className="flex justify-between mt-1 text-xs num-mono">
-                  <span className="text-orange-600 font-bold">{fmt(c.raised_amount, c.currency, currencies)}</span>
+                  <span className="text-amber-600 font-bold">{fmt(c.raised_amount, c.currency, currencies)}</span>
                   <span className="text-slate-400">
                     {t.target} {fmt(c.target_amount, c.currency, currencies)}
                   </span>
@@ -57,7 +57,7 @@ export function CasesClient({ cases }: { cases: EmergencyCase[] }) {
               <button
                 type="button"
                 onClick={() => closeCase(c.id)}
-                className="mt-3 text-[11px] font-bold text-slate-400 hover:text-orange-600 transition-colors"
+                className="mt-3 text-[11px] font-bold text-slate-400 hover:text-amber-600 transition-colors"
               >
                 {lang === "ar" ? "إقفال الحالة" : "Close case"}
               </button>
@@ -70,7 +70,7 @@ export function CasesClient({ cases }: { cases: EmergencyCase[] }) {
         <button
           type="button"
           onClick={() => setShowAdd(true)}
-          className="print:hidden fixed bottom-20 left-1/2 -translate-x-1/2 bg-orange-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg shadow-orange-600/30 z-30 transition-transform duration-150 active:scale-90"
+          className="print:hidden fixed bottom-20 left-1/2 -translate-x-1/2 bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg shadow-amber-600/30 z-30 transition-transform duration-150 active:scale-90"
         >
           <Plus size={22} />
         </button>
@@ -134,7 +134,7 @@ function AddCaseModal({ onClose }: { onClose: () => void }) {
         <button
           type="submit"
           disabled={pending}
-          className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm disabled:opacity-60 transition-transform duration-150 active:scale-[0.98]"
+          className="w-full bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-xl py-2.5 font-bold text-sm disabled:opacity-60 transition-transform duration-150 active:scale-[0.98]"
         >
           {pending ? "..." : t.save}
         </button>
