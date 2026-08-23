@@ -138,11 +138,12 @@ export function HomeClient({
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-slate-900/5">
-        <div className="flex items-start justify-between gap-2 mb-1">
-          <div className="flex items-center gap-2">
-            <span className="w-7 h-7 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
-              <TrendingUp size={14} className="text-orange-600" />
+      <div className="relative overflow-hidden bg-white rounded-2xl p-4 shadow-sm ring-1 ring-slate-900/5">
+        <div className="absolute -start-10 -top-12 w-32 h-32 rounded-full bg-orange-50/70" />
+        <div className="relative flex items-start justify-between gap-2 mb-2">
+          <div className="flex items-center gap-2.5">
+            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shrink-0 shadow-sm shadow-orange-600/25">
+              <TrendingUp size={16} className="text-white" />
             </span>
             <div>
               <p className="text-slate-800 text-xs font-bold">{t.chartTitle}</p>
@@ -150,12 +151,22 @@ export function HomeClient({
             </div>
           </div>
           {chart.length > 0 && (
-            <p className="num-mono font-black text-lg text-slate-800 shrink-0">
-              ${chart[chart.length - 1].value.toLocaleString("en-US")}
-            </p>
+            <div className="text-end shrink-0">
+              <p className="num-mono font-black text-xl text-slate-800 leading-none">
+                ${chart[chart.length - 1].value.toLocaleString("en-US")}
+              </p>
+              <div
+                className={`inline-flex items-center gap-0.5 text-[10px] font-bold mt-1 px-1.5 py-0.5 rounded-md ${monthGrowth.up ? "bg-orange-50 text-orange-600" : "bg-slate-100 text-slate-500"}`}
+              >
+                {monthGrowth.up ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+                {Math.abs(monthGrowth.pct).toFixed(1)}%
+              </div>
+            </div>
           )}
         </div>
-        <GrowthChart data={chart} rtl={dir === "rtl"} />
+        <div className="relative">
+          <GrowthChart data={chart} rtl={dir === "rtl"} />
+        </div>
       </div>
 
       <div>

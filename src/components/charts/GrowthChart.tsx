@@ -107,7 +107,10 @@ export function GrowthChart({ data, rtl = true }: { data: { label: string; value
             type="monotone"
             dataKey="value"
             stroke="#EA580C"
-            strokeWidth={2.5}
+            strokeWidth={2.75}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ filter: "drop-shadow(0 3px 5px rgba(234,88,12,0.28))" }}
             fill="url(#growthGradient)"
             dot={(props: { cx?: number; cy?: number; index?: number }) => (
               <PlotDot key={props.index} {...props} lastIndex={lastIndex} />
