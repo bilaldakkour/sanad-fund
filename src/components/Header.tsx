@@ -28,14 +28,18 @@ export function Header() {
   const [showSidebar, setShowSidebar] = useState(false);
 
   const sidebarItems = [
-    { href: "/donate", label: t.nav.donate, icon: HeartHandshake },
-    ...(REPORT_ROLES.includes(profile.role) ? [{ href: "/reports", label: t.nav.reports, icon: FileBarChart }] : []),
-    ...(HANDOVER_ROLES.includes(profile.role) ? [{ href: "/handover", label: t.nav.handover, icon: HandCoins }] : []),
+    { href: "/donate", label: t.nav.donate, icon: HeartHandshake, color: "from-orange-500 to-orange-600 shadow-orange-600/25" },
+    ...(REPORT_ROLES.includes(profile.role)
+      ? [{ href: "/reports", label: t.nav.reports, icon: FileBarChart, color: "from-indigo-500 to-indigo-600 shadow-indigo-600/25" }]
+      : []),
+    ...(HANDOVER_ROLES.includes(profile.role)
+      ? [{ href: "/handover", label: t.nav.handover, icon: HandCoins, color: "from-teal-500 to-teal-600 shadow-teal-600/25" }]
+      : []),
     ...(APPROVER_ROLES.includes(profile.role)
-      ? [{ href: "/approvals", label: t.nav.approvals, icon: ClipboardCheck }]
+      ? [{ href: "/approvals", label: t.nav.approvals, icon: ClipboardCheck, color: "from-violet-500 to-violet-600 shadow-violet-600/25" }]
       : []),
     ...(["admin", "treasurer"].includes(profile.role)
-      ? [{ href: "/settings", label: t.nav.settings, icon: SettingsIcon }]
+      ? [{ href: "/settings", label: t.nav.settings, icon: SettingsIcon, color: "from-slate-500 to-slate-600 shadow-slate-600/25" }]
       : []),
   ];
 

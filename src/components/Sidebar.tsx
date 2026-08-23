@@ -14,6 +14,7 @@ export interface SidebarItem {
   href: string;
   label: string;
   icon: LucideIcon;
+  color: string;
 }
 
 export function Sidebar({ items, onClose }: { items: SidebarItem[]; onClose: () => void }) {
@@ -58,7 +59,7 @@ export function Sidebar({ items, onClose }: { items: SidebarItem[]; onClose: () 
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
-          {items.map(({ href, label, icon: Icon }) => {
+          {items.map(({ href, label, icon: Icon, color }) => {
             const active = pathname.startsWith(href);
             return (
               <Link
@@ -70,11 +71,7 @@ export function Sidebar({ items, onClose }: { items: SidebarItem[]; onClose: () 
                 }`}
               >
                 <span
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                    active
-                      ? "bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-sm shadow-orange-600/25"
-                      : "bg-slate-100 text-slate-500"
-                  }`}
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br text-white shadow-sm ${color}`}
                 >
                   <Icon size={17} />
                 </span>
