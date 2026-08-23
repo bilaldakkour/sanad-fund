@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toBlob } from "html-to-image";
-import { Printer, Share2, X } from "lucide-react";
+import { Printer, Receipt as ReceiptIcon, Share2, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAppData } from "@/lib/AppDataProvider";
@@ -14,6 +14,20 @@ export function ReceiptModal({ entry, onClose }: { entry: LedgerEntry; onClose: 
   const { settings, currencies } = useAppData();
   const receiptRef = useRef<HTMLDivElement>(null);
   const [sharing, setSharing] = useState(false);
+  const [printMode, setPrintMode] = useState<"a4" | "thermal">("a4");
+
+  useEffect(() => {
+    const reset = () => setPrintMode("a4");
+    window.addEventListener("afterprint", reset);
+    return () => window.removeEventListener("afterprint", reset);
+  }, []);
+
+  function handlePrint(mode: "a4" | "thermal") {
+    setPrintMode(mode);
+    // لازم نستنى فريم واحد كرمال صنف .print-thermal-80 ينضاف للـ DOM فعليًا
+    // قبل ما نستدعي window.print() — وإلا الطباعة بتصير بإعداد الصفحة القديم.
+    requestAnimationFrame(() => window.print());
+  }
 
   async function handleShare() {
     if (!receiptRef.current || sharing) return;
@@ -47,10 +61,10 @@ export function ReceiptModal({ entry, onClose }: { entry: LedgerEntry; onClose: 
         <button onClick={onClose} className="print:hidden absolute top-4 left-4 text-slate-400">
           <X size={20} />
         </button>
-        <div ref={receiptRef} className="bg-white">
+        <div ref={receiptRef} className={`bg-white ${printMode === "thermal" ? "print-thermal-80" : ""}`}>
           <div className="text-center border-b-2 border-dashed border-slate-200 pb-4 mb-4">
             <div className="flex justify-center">
-              <Logo size={44} />
+              <Logo size={printMode === "thermal" ? 30 : 44} />
             </div>
             <p className="font-black text-lg mt-2">{lang === "ar" ? settings.org_name_ar : settings.org_name_en}</p>
             <p className="text-[11px] text-slate-400">{lang === "ar" ? settings.tagline_ar : settings.tagline_en}</p>
@@ -70,17 +84,26 @@ export function ReceiptModal({ entry, onClose }: { entry: LedgerEntry; onClose: 
             {lang === "ar" ? settings.thank_you_ar : settings.thank_you_en}
           </p>
         </div>
-        <div className="print:hidden flex gap-2 mt-5">
-          <button
-            onClick={() => window.print()}
-            className="flex-1 bg-slate-900 text-white rounded-xl py-2.5 font-bold text-sm flex items-center justify-center gap-2 transition-transform duration-150 active:scale-[0.98]"
-          >
-            <Printer size={16} /> {t.print}
-          </button>
+        <div className="print:hidden mt-5 space-y-2">
+          <p className="text-[11px] font-bold text-slate-400">{t.choosePrintMode}</p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => handlePrint("a4")}
+              className="flex-1 bg-slate-900 text-white rounded-xl py-2.5 font-bold text-sm flex items-center justify-center gap-2 transition-transform duration-150 active:scale-[0.98]"
+            >
+              <Printer size={16} /> {t.printA4}
+            </button>
+            <button
+              onClick={() => handlePrint("thermal")}
+              className="flex-1 bg-slate-700 text-white rounded-xl py-2.5 font-bold text-sm flex items-center justify-center gap-2 transition-transform duration-150 active:scale-[0.98]"
+            >
+              <ReceiptIcon size={16} /> {t.printThermal}
+            </button>
+          </div>
           <button
             onClick={handleShare}
             disabled={sharing}
-            className="flex-1 bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-60 transition-transform duration-150 active:scale-[0.98]"
+            className="w-full bg-orange-600 text-white rounded-xl py-2.5 font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-60 transition-transform duration-150 active:scale-[0.98]"
           >
             <Share2 size={16} /> {sharing ? "..." : t.shareReceipt}
           </button>

@@ -65,4 +65,41 @@ html[dir="ltr"] .sidebar-panel {
     background: #ffffff !important;
     color: #0f172a !important;
   }
+
+  /* وصل التبرع على طابعة حرارية 80mm (بلوتوث عبر خدمة طباعة الأندرويد) —
+     صفحة مسمّاة منفصلة (page: thermal-80) بعرض الرول الفعلي، وخطوط أصغر
+     تتلاءم مع عرض 76mm بدل نص A4 اللي بينكرش عالورق الضيق. */
+  @page thermal-80 {
+    size: 80mm auto;
+    margin: 3mm;
+  }
+
+  .print-thermal-80 {
+    page: thermal-80;
+    width: 74mm;
+  }
+
+  .print-thermal-80 .text-3xl {
+    font-size: 20px !important;
+  }
+
+  .print-thermal-80 .text-xl {
+    font-size: 15px !important;
+  }
+
+  .print-thermal-80 .text-lg {
+    font-size: 13px !important;
+  }
+
+  .print-thermal-80 .text-sm {
+    font-size: 11px !important;
+  }
+
+  .print-thermal-80 .text-xs {
+    font-size: 9px !important;
+  }
+
+  .print-thermal-80 .text-\[11px\] {
+    font-size: 8px !important;
+  }
 }
