@@ -2,6 +2,25 @@
 
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
+function formatCompact(value: number) {
+  if (Math.abs(value) >= 1000) return `$${(value / 1000).toLocaleString("en-US", { maximumFractionDigits: 1 })}k`;
+  return `$${Math.round(value).toLocaleString("en-US")}`;
+}
+
+// Ticks بأرقام "مدوّرة" فعليًا (0, 25, 50...) بدل ما نترك Recharts يخمّن — بيخلي
+// محور القيم يحس إنه محسوب، مش عشوائي.
+function niceTicks(max: number, count = 4): number[] {
+  if (max <= 0) return [0, 1];
+  const rawStep = max / (count - 1);
+  const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep)));
+  const residual = rawStep / magnitude;
+  const niceResidual = residual > 5 ? 10 : residual > 2 ? 5 : residual > 1 ? 2 : 1;
+  const step = niceResidual * magnitude;
+  const ticks: number[] = [];
+  for (let v = 0; v <= max + step * 0.01; v += step) ticks.push(Math.round(v * 100) / 100);
+  return ticks;
+}
+
 function ChartTooltip({
   active,
   payload,
@@ -15,14 +34,12 @@ function ChartTooltip({
   return (
     <div className="bg-white rounded-xl shadow-lg ring-1 ring-slate-900/5 px-3 py-2">
       <p className="text-[10px] font-bold text-slate-400">{label}</p>
-      <p className="num-mono font-black text-sm text-slate-800">
-        ${Number(payload[0].value).toLocaleString("en-US")}
-      </p>
+      <p className="num-mono font-black text-sm text-slate-800">{formatCompact(payload[0].value)}</p>
     </div>
   );
 }
 
-function EndpointDot({
+function PlotDot({
   cx,
   cy,
   index,
@@ -33,30 +50,29 @@ function EndpointDot({
   index?: number;
   lastIndex: number;
 }) {
-  if (index !== lastIndex || cx == null || cy == null) return null;
+  if (cx == null || cy == null) return null;
+  const isLast = index === lastIndex;
   return (
     <g>
-      <circle cx={cx} cy={cy} r={7} fill="#EA580C" fillOpacity={0.18} />
-      <circle cx={cx} cy={cy} r={3.5} fill="#EA580C" stroke="white" strokeWidth={2} />
+      {isLast && <circle cx={cx} cy={cy} r={8} fill="#EA580C" fillOpacity={0.16} />}
+      <circle cx={cx} cy={cy} r={isLast ? 4 : 2.5} fill={isLast ? "#EA580C" : "white"} stroke="#EA580C" strokeWidth={isLast ? 2 : 1.75} />
     </g>
   );
 }
 
-function formatTick(value: number) {
-  if (Math.abs(value) >= 1000) return `$${(value / 1000).toLocaleString("en-US", { maximumFractionDigits: 1 })}k`;
-  return `$${Math.round(value).toLocaleString("en-US")}`;
-}
-
 export function GrowthChart({ data, rtl = true }: { data: { label: string; value: number }[]; rtl?: boolean }) {
   const lastIndex = data.length - 1;
+  const max = Math.max(0, ...data.map((d) => d.value));
+  const ticks = niceTicks(max);
+  const domainMax = ticks[ticks.length - 1];
 
   return (
-    <div style={{ width: "100%", height: 170 }}>
+    <div style={{ width: "100%", height: 200 }}>
       <ResponsiveContainer>
-        <AreaChart data={data} margin={{ top: 12, right: 4, left: 4, bottom: 0 }}>
+        <AreaChart data={data} margin={{ top: 18, right: 6, left: 2, bottom: 0 }}>
           <defs>
             <linearGradient id="growthGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#EA580C" stopOpacity={0.35} />
+              <stop offset="5%" stopColor="#EA580C" stopOpacity={0.32} />
               <stop offset="95%" stopColor="#EA580C" stopOpacity={0} />
             </linearGradient>
           </defs>
@@ -71,12 +87,13 @@ export function GrowthChart({ data, rtl = true }: { data: { label: string; value
           />
           <YAxis
             orientation={rtl ? "right" : "left"}
-            tickFormatter={formatTick}
+            ticks={ticks}
+            domain={[0, domainMax]}
+            tickFormatter={formatCompact}
             tick={{ fontSize: 10, fill: "#cbd5e1", fontWeight: 600 }}
             axisLine={false}
             tickLine={false}
-            width={44}
-            tickCount={3}
+            width={46}
           />
           <Tooltip content={<ChartTooltip />} cursor={{ stroke: "#EA580C", strokeWidth: 1, strokeDasharray: "3 3" }} />
           <Area
@@ -86,9 +103,27 @@ export function GrowthChart({ data, rtl = true }: { data: { label: string; value
             strokeWidth={2.5}
             fill="url(#growthGradient)"
             dot={(props: { cx?: number; cy?: number; index?: number }) => (
-              <EndpointDot key={props.index} {...props} lastIndex={lastIndex} />
+              <PlotDot key={props.index} {...props} lastIndex={lastIndex} />
             )}
             activeDot={{ r: 4, fill: "#EA580C", stroke: "white", strokeWidth: 2 }}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            label={(props: any) => {
+              if (props.index !== lastIndex || props.x == null || props.y == null) return null;
+              return (
+                <text
+                  key="growth-label"
+                  x={props.x}
+                  y={Number(props.y) - 14}
+                  textAnchor="middle"
+                  className="num-mono"
+                  fontSize={12}
+                  fontWeight={800}
+                  fill="#9a3412"
+                >
+                  {formatCompact(Number(props.value) || 0)}
+                </text>
+              );
+            }}
           />
         </AreaChart>
       </ResponsiveContainer>
