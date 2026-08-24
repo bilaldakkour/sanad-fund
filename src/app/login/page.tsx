@@ -59,6 +59,15 @@ export default function LoginPage() {
             {t.joinRequest}
           </Link>
         </p>
+        <p className="text-center text-[11px] text-slate-400">
+          <Link href="/terms" className="underline">
+            {t.termsLink}
+          </Link>{" "}
+          {t.andWord}{" "}
+          <Link href="/privacy" className="underline">
+            {t.privacyLink}
+          </Link>
+        </p>
       </form>
     </div>
   );

@@ -108,6 +108,16 @@ export default function RegisterPage() {
             {t.loginLink}
           </Link>
         </p>
+        <p className="text-center text-[11px] text-slate-400">
+          {t.termsAgreement}{" "}
+          <Link href="/terms" className="text-slate-600 font-bold underline">
+            {t.termsLink}
+          </Link>{" "}
+          {t.andWord}{" "}
+          <Link href="/privacy" className="text-slate-600 font-bold underline">
+            {t.privacyLink}
+          </Link>
+        </p>
       </form>
     </div>
   );

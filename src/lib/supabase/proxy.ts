@@ -7,8 +7,16 @@ const PUBLIC_PATHS = ["/login", "/register"];
 // هويتها بنفسها بسر مشترك بالهيدر، فما لازم تمر بمنطق تسجيل الدخول هون.
 const WEBHOOK_PATHS = ["/api/notify-email"];
 
+// صفحات معلوماتية (سياسة الخصوصية، الشروط) لازم تظل قابلة للفتح لأي حدا —
+// مسجّل دخول أو لأ — بعكس /login و/register يلي بتحوّل المستخدم المسجّل
+// دخوله بعيد عنها.
+const ALWAYS_PUBLIC_PATHS = ["/privacy", "/terms"];
+
 export async function updateSession(request: NextRequest) {
-  if (WEBHOOK_PATHS.some((p) => request.nextUrl.pathname.startsWith(p))) {
+  if (
+    WEBHOOK_PATHS.some((p) => request.nextUrl.pathname.startsWith(p)) ||
+    ALWAYS_PUBLIC_PATHS.some((p) => request.nextUrl.pathname.startsWith(p))
+  ) {
     return NextResponse.next({ request });
   }
 
