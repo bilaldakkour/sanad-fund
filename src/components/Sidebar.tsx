@@ -82,8 +82,17 @@ export function Sidebar({ items, onClose }: { items: SidebarItem[]; onClose: () 
           })}
         </nav>
 
-        <div className="relative overflow-hidden shrink-0 border-t border-slate-100 px-4 py-3">
+        <div className="relative overflow-hidden shrink-0 border-t border-slate-100 px-4 pt-3 pb-4">
           <BrandRings className="absolute -start-4 -bottom-6 w-24 h-24 text-orange-500/[0.06]" />
+          <div className="relative flex items-center justify-center gap-3 mb-2">
+            <Link href="/terms" onClick={onClose} className="text-[11px] font-bold text-slate-500 underline">
+              {t.termsLink}
+            </Link>
+            <span className="text-slate-200">·</span>
+            <Link href="/privacy" onClick={onClose} className="text-[11px] font-bold text-slate-500 underline">
+              {t.privacyLink}
+            </Link>
+          </div>
           <p className="relative text-[10px] text-slate-400 text-center">
             {lang === "ar" ? settings.tagline_ar : settings.tagline_en}
           </p>
